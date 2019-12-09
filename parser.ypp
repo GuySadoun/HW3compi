@@ -9,27 +9,35 @@
 	extern int yylineno;
 	int yyerror(const char * message);
 %}
+%union types{
+    int integer;
+    string str;
+    enum enumy;
+    char singlechar;
+};
+%token <str> BOOL VOID
+%token <enumy> ENUM
+%token <integer> INT BYTE B
+%token <str> TRUE FALSE
+%token <str> WHILE RETURN
+%token <str> BREAK CONTINUE
+%token <singlechar> SC COMMA
+%token <str> STRING ID
+%token <integer> NUM
 
-%token BOOL VOID INT BYTE ENUM B
-%token TRUE FALSE
-%token WHILE RETURN
-%token BREAK CONTINUE
-%token SC COMMA
-%token STRING ID NUM
-
-%right ASSIGN
+%right <singlechar> ASSIGN
 %nonassoc NO_ELSE
-%nonassoc ELSE
-%right IF
-%left OR
-%left AND
-%left EQUALITY
-%nonassoc LHSS
-%nonassoc RHSS
-%left ADDITIVE
-%left MUL
-%right NOT
-%left LPAREN RPAREN LBRACE RBRACE
+%nonassoc <str> ELSE
+%right <str> IF
+%left <str> OR
+%left <str> AND
+%left <str> EQUALITY
+%nonassoc <str> LHSS
+%nonassoc <str> RHSS
+%left <singlechar> ADDITIVE
+%left <singlechar> MUL
+%right <str> NOT
+%left <singlechar> LPAREN RPAREN LBRACE RBRACE
 
 %%
 
