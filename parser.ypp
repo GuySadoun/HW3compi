@@ -1,0 +1,143 @@
+%{
+	#include <iostream>
+	#include <stdlib.h>
+    #include "output.hpp"
+	using namespace std;
+	using namespace output;
+	extern int yylex();
+	extern char* yytext;
+	extern int yylineno;
+	int yyerror(const char * message);
+%}
+
+%token BOOL VOID INT BYTE ENUM B
+%token TRUE FALSE
+%token WHILE RETURN
+%token BREAK CONTINUE
+%token SC COMMA
+%token STRING ID NUM
+
+%right ASSIGN
+%nonassoc NO_ELSE
+%nonassoc ELSE
+%right IF
+%left OR
+%left AND
+%left EQUALITY
+%nonassoc LHSS
+%nonassoc RHSS
+%left ADDITIVE
+%left MUL
+%right NOT
+%left LPAREN RPAREN LBRACE RBRACE
+
+%%
+
+Program : Enums Funcs { printProductionRule(1); }
+    ;
+
+Funcs : %empty { printProductionRule(2); }
+    | FuncDecl Funcs { printProductionRule(3); }
+    ;
+
+FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE { printProductionRule(4); }
+    ;
+
+Enums : %empty { printProductionRule(5); }
+    | EnumDecl Enums { printProductionRule(6); }
+    ;
+
+EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { printProductionRule(7); }
+    ;
+
+RetType : Type { printProductionRule(8); }
+    | VOID { printProductionRule(9); }
+    ;
+
+Formals : %empty { printProductionRule(10); }
+    | FormalsList { printProductionRule(11); }
+    ;
+
+FormalsList : FormalDecl { printProductionRule(12); }
+    | FormalDecl COMMA FormalsList { printProductionRule(13); }
+    ;
+
+FormalDecl : Type ID { printProductionRule(14); }
+    | EnumType ID { printProductionRule(15); }
+    ;
+
+EnumeratorList : Enumerator { printProductionRule(16); }
+    | EnumeratorList COMMA Enumerator { printProductionRule(17); }
+    ;
+
+Enumerator : ID { printProductionRule(18); }
+    ;
+
+Statements : Statement { printProductionRule(19); }
+    | Statements Statement { printProductionRule(20); }
+    ;
+
+Statement : LBRACE Statements RBRACE { printProductionRule(21); }
+    | Type ID SC { printProductionRule(22); }
+    | EnumType ID SC { printProductionRule(23); }
+    | EnumDecl { printProductionRule(24); }
+    | Type ID ASSIGN Exp SC { printProductionRule(25); }
+    | EnumType ID ASSIGN Exp SC { printProductionRule(26); }
+    | ID ASSIGN Exp SC { printProductionRule(27); }
+    | Call SC { printProductionRule(28); }
+    | RETURN SC { printProductionRule(29); }
+    | RETURN Exp SC { printProductionRule(30); }
+    | IF LPAREN Exp RPAREN Statement %prec NO_ELSE { printProductionRule(31); }
+    | IF LPAREN Exp RPAREN Statement ELSE Statement { printProductionRule(32); }
+    | WHILE LPAREN Exp RPAREN Statement { printProductionRule(33); }
+    | BREAK SC { printProductionRule(34); }
+    | CONTINUE SC { printProductionRule(35); }
+    ;
+
+Call : ID LPAREN ExpList RPAREN { printProductionRule(36); }
+    | ID LPAREN RPAREN { printProductionRule(37); }
+    ;
+
+ExpList : Exp { printProductionRule(38); }
+    | Exp COMMA ExpList { printProductionRule(39); }
+    ;
+
+Type : INT { printProductionRule(40); }
+    | BYTE { printProductionRule(41); }
+    | BOOL { printProductionRule(42); }
+    ;
+
+EnumType : ENUM ID { printProductionRule(43); }
+    ;
+
+Exp : LPAREN Exp RPAREN { printProductionRule(44); }
+    | Exp ADDITIVE Exp { printProductionRule(45); }
+    | Exp MUL Exp { printProductionRule(45); }
+    | ID { printProductionRule(46); }
+    | Call { printProductionRule(47); }
+    | NUM { printProductionRule(48); }
+    | NUM B { printProductionRule(49); }
+    | STRING { printProductionRule(50); }
+    | TRUE { printProductionRule(51); }
+    | FALSE { printProductionRule(52); }
+    | NOT Exp { printProductionRule(53); }
+    | Exp AND Exp { printProductionRule(54); }
+    | Exp OR Exp { printProductionRule(55); }
+    | Exp EQUALITY Exp { printProductionRule(56); }
+    | Exp RHSS Exp { printProductionRule(56); }
+    | Exp LHSS Exp { printProductionRule(56); }
+    | LPAREN Type RPAREN Exp { printProductionRule(57); }
+    ;
+%%
+
+int main()
+{
+	yyparse();
+}
+
+int yyerror(const char * message)
+{
+    if (yylval == 1) errorLex(yylineno);
+	else errorSyn(yylineno);
+	exit(0);
+}
