@@ -2,6 +2,7 @@
 	#include <iostream>
 	#include <stdlib.h>
     #include "output.hpp"
+    #include "structs.h"
 	using namespace std;
 	using namespace output;
 	extern int yylex();
@@ -9,12 +10,7 @@
 	extern int yylineno;
 	int yyerror(const char * message);
 %}
-%union types{
-    int integer;
-    string str;
-    enum enumy;
-    char singlechar;
-};
+
 %token <str> BOOL VOID
 %token <enumy> ENUM
 %token <integer> INT BYTE B

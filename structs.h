@@ -5,4 +5,63 @@
 #ifndef HW3COMPI_STRUCTS_H
 #define HW3COMPI_STRUCTS_H
 
+#include <string>
+#include <vector>
+#include <iostream>
+
+using std::string;
+
+enum type {INT, BYTE, BOOL};
+
+class EnumClass {
+    string name;
+    std::vector<string> enumarators;
+public:
+    EnumClass(string str) {
+        name = "enum" + str;
+    }
+    string getName() {
+        return name;
+    }
+    void addEnumarator(string enumarator) {
+        enumarators.push_back(enumarator);
+    }
+};
+
+
+class TypeClass {
+    type t;
+public:
+    TypeClass(const string& type) {
+        switch (type) {
+            case "INT":
+                t = INT;
+                break;
+            case "BYTE":
+                t = BYTE;
+                break;
+            case "BOOL":
+                t = BOOL;
+                break;
+            default:
+                std::cout << "oi vey";
+        }
+    }
+    type getType() {
+        return t;
+    }
+};
+
+
+
+typedef union {
+    int integer;
+    char singlechar;
+    string str;
+    EnumClass enumClass;
+    TypeClass typeClass;
+
+} Types;
+
+#define YYSTYPE Types
 #endif //HW3COMPI_STRUCTS_H
