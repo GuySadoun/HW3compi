@@ -11,7 +11,7 @@
 
 using std::string;
 
-enum type {INT, BYTE, BOOL};
+enum type {INT, BYTE, BOOL, VOID};
 
 class EnumClass {
     string name;
@@ -28,27 +28,11 @@ public:
     }
 };
 
-
 class TypeClass {
     type t;
 public:
-    TypeClass(const string& type) {
-        switch (type) {
-            case "INT":
-                t = INT;
-                break;
-            case "BYTE":
-                t = BYTE;
-                break;
-            case "BOOL":
-                t = BOOL;
-                break;
-            default:
-                std::cout << "oi vey";
-        }
-    }
-    type getType() {
-        return t;
+    TypeClass(type type) {
+        t = type;
     }
 };
 
@@ -64,4 +48,5 @@ typedef union {
 } Types;
 
 #define YYSTYPE Types
+
 #endif //HW3COMPI_STRUCTS_H

@@ -11,6 +11,8 @@
 	extern int yylineno;
 	TableStack *symbolTable;
 	int yyerror(const char * message);
+	string currRetType;
+	string currName;
 %}
 
 %token <str> BOOL VOID
@@ -46,12 +48,13 @@ Funcs : %empty { printProductionRule(2); }
     | FuncDecl Funcs { printProductionRule(3); }
     ;
 
-FuncDecl : RetType ID LPAREN Formals RPAREN InsertDecl LBRACE NewScope Statements RBRACE { printProductionRule(4); }
+FuncDecl : RetType ID InsertDecl LPAREN Formals RPAREN  LBRACE NewScope Statements RBRACE { printProductionRule(4); }
     ;
 
 InsertDecl : %empty {
                         if (!symbolTable) symbolTable = new TableStack;
-                        symbolTable->newVar(
+                        symbolTable->newVar((string)yytext,
+                    }
 
 Enums : %empty { printProductionRule(5); }
     | EnumDecl Enums { printProductionRule(6); }
@@ -61,7 +64,7 @@ EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { printProductionRule(7); }
     ;
 
 RetType : Type { printProductionRule(8); }
-    | VOID { printProductionRule(9); }
+    | VOID { currRetType = VOID }
     ;
 
 Formals : %empty { printProductionRule(10); }
@@ -117,9 +120,9 @@ ExpList : Exp { printProductionRule(38); }
     | Exp COMMA ExpList { printProductionRule(39); }
     ;
 
-Type : INT { printProductionRule(40); }
-    | BYTE { printProductionRule(41); }
-    | BOOL { printProductionRule(42); }
+Type : INT { currRetType = "int"; }
+    | BYTE { currRetType = "byte"; }
+    | BOOL { currRetType = "bool"; }
     ;
 
 EnumType : ENUM ID { printProductionRule(43); }
