@@ -24,13 +24,13 @@ int OffsetStack::getTop(){
     return this->offsetStack.top();
 }
 
-int OffsetStack::endScope(){
+void OffsetStack::endScope(){
 
     if (offsetStack.empty()) {
         string exceptionMessage("Table is empty");
         throw (OffsetErr(exceptionMessage));
     }
-    return this->offsetStack.pop();
+    offsetStack.pop();
 }
 
 void OffsetStack::newScope() {
