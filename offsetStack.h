@@ -5,6 +5,7 @@
 #ifndef HW3COMPI_OFFSETSTACK_H
 #define HW3COMPI_OFFSETSTACK_H
 
+#include <iostream>
 #include <string>
 #include <stack>
 
@@ -13,8 +14,12 @@ using std::stack;
 
 class OffsetStack {
     stack<int> offsetStack;
+    int current;
 public:
-    void incFirst();
+    OffsetStack();
+    void incTop();
+    int getTop();
+    void endScope();
     void dupAndAddTop();
 };
 
