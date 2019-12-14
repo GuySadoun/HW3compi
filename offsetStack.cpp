@@ -31,6 +31,7 @@ void OffsetStack::endScope(){
         throw (OffsetErr(exceptionMessage));
     }
     offsetStack.pop();
+    current = offsetStack.top();
 }
 
 void OffsetStack::newScope() {
