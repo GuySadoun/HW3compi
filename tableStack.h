@@ -36,9 +36,11 @@ class TableStack {
         bool existInTable(string name);
         ~Table();
     };
-    stack<Table*> tablesStack;
+    vector<Table*> tablesStack;
+    OffsetStack offsetStack;
 public:
-    void newVar(string name, string type, int off);
+    TableStack() = default;
+    void newVar(string name, string type);
     void newScope();
     void endScope();
 };

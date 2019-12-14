@@ -25,20 +25,25 @@ bool TableStack::Table::existInTable(string name) {
     return false;
 }
 
-void TableStack::newVar(string name, string type, int off) {
+void TableStack::newVar(string name, string type) {
     if (tablesStack.empty()) {
         string exceptionMessage("new var with empty");
         throw (TblErr(exceptionMessage));
     }
-    if (tablesStack.top()->existInTable(name)) {
-        string exceptionMessage("already exist in scopeTable");
-        throw (TblErr(exceptionMessage));
+    for (auto table : tablesStack) {
+        if (table->existInTable(name)) {
+            string exceptionMessage("already exist in scopeTable");
+            throw (TblErr(exceptionMessage));
+        }
     }
-    tablesStack.top()->newLine(name, type, off);
+    tablesStack.front()->newLine(name, type, offsetStack.getTop());
+    offsetStack.incTop();
 }
 
 void TableStack::newScope() {
-    tablesStack.push(new Table);
+    auto it = tablesStack.begin();
+    offsetStack.newScope();
+    tablesStack.insert(it, new Table);
 }
 
 void TableStack::endScope() {
@@ -46,6 +51,7 @@ void TableStack::endScope() {
         string exceptionMessage("end scope with empty stack");
         throw (TblErr(exceptionMessage));
     }
-    delete tablesStack.top();
-    tablesStack.pop();
+    delete *(tablesStack.begin());
+    tablesStack.erase(tablesStack.begin());
+    offsetStack.endScope();
 }

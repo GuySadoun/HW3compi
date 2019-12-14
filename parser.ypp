@@ -3,11 +3,13 @@
 	#include <stdlib.h>
     #include "output.hpp"
     #include "structs.h"
+    #include "tableStack.h"
 	using namespace std;
 	using namespace output;
 	extern int yylex();
 	extern char* yytext;
 	extern int yylineno;
+	TableStack *symbolTable;
 	int yyerror(const char * message);
 %}
 
@@ -44,8 +46,12 @@ Funcs : %empty { printProductionRule(2); }
     | FuncDecl Funcs { printProductionRule(3); }
     ;
 
-FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE { printProductionRule(4); }
+FuncDecl : RetType ID LPAREN Formals RPAREN InsertDecl LBRACE NewScope Statements RBRACE { printProductionRule(4); }
     ;
+
+InsertDecl : %empty {
+                        if (!symbolTable) symbolTable = new TableStack;
+                        symbolTable->newVar(
 
 Enums : %empty { printProductionRule(5); }
     | EnumDecl Enums { printProductionRule(6); }
@@ -66,7 +72,7 @@ FormalsList : FormalDecl { printProductionRule(12); }
     | FormalDecl COMMA FormalsList { printProductionRule(13); }
     ;
 
-FormalDecl : Type ID { printProductionRule(14); }
+FormalDecl : Type ID InsertDecl { printProductionRule(14); }
     | EnumType ID { printProductionRule(15); }
     ;
 
@@ -81,7 +87,7 @@ Statements : Statement { printProductionRule(19); }
     | Statements Statement { printProductionRule(20); }
     ;
 
-Statement : LBRACE Statements RBRACE { printProductionRule(21); }
+Statement : LBRACE NewScope Statements RBRACE { printProductionRule(21); }
     | Type ID SC { printProductionRule(22); }
     | EnumType ID SC { printProductionRule(23); }
     | EnumDecl { printProductionRule(24); }
@@ -97,6 +103,11 @@ Statement : LBRACE Statements RBRACE { printProductionRule(21); }
     | BREAK SC { printProductionRule(34); }
     | CONTINUE SC { printProductionRule(35); }
     ;
+
+NewScope : %empty {
+                        if (!symbolTable) symbolTable = new TableStack;
+                        symbolTable->newScope();
+                   }
 
 Call : ID LPAREN ExpList RPAREN { printProductionRule(36); }
     | ID LPAREN RPAREN { printProductionRule(37); }

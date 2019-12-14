@@ -4,12 +4,10 @@
 #include "offsetStack.h"
 
 void OffsetStack::incTop() {
-
     if (offsetStack.empty()) {
         string exceptionMessage("Table is empty");
         throw (OffsetErr(exceptionMessage));
     }
-
     current++;
     offsetStack.pop();
     offsetStack.push(current);
