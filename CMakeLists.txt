@@ -3,4 +3,4 @@ project(HW3compi)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(HW3compi main.cpp structs.h)
+add_executable(HW3compi main.cpp offsetStack.h tableStack.cpp offsetStack.cpp structs.h tableStack.h)
