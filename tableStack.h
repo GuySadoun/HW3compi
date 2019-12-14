@@ -9,6 +9,18 @@
 
 using std::string;
 using std::stack;
+using std::cout;
+using std::endl;
+
+class TblErr : public std::exception {
+public:
+    TblErr(const string msg) : m_msg(msg) {}
+    const char* what() const throw () override {
+        cout << "TblErr - what:" << m_msg << endl;
+        return m_msg.c_str();
+    }
+    const string m_msg;
+};
 
 class TableStack {
     class Table {
@@ -21,7 +33,6 @@ class TableStack {
         };
         stack<TableEntry> scopeTable;
     public:
-
         Table() = default;
         void newLine(string name, string type, int off);
         void removeTopTable();
