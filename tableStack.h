@@ -6,9 +6,10 @@
 #define HW3COMPI_TABLESTACK_H
 
 #include "offsetStack.h"
-
+#include <vector>
 using std::string;
 using std::stack;
+using std::vector;
 using std::cout;
 using std::endl;
 
@@ -31,13 +32,14 @@ class TableStack {
 
             TableEntry(string name, string type, int offset) : name(name), type(type), offset(offset) {}
         };
-        stack<TableEntry> scopeTable;
+        vector<TableEntry> scopeTable;
     public:
         Table() = default;
         void newLine(string name, string type, int off);
-        void removeTopTable();
+        bool existInTable(string name);
+        ~Table();
     };
-    stack<Table> tablesStuck;
+    stack<Table*> tablesStack;
 public:
     void newVar(string name, string type, int off);
     void newScope();
