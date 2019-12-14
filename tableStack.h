@@ -7,11 +7,8 @@
 
 #include "offsetStack.h"
 #include <vector>
-using std::string;
-using std::stack;
+
 using std::vector;
-using std::cout;
-using std::endl;
 
 class TblErr : public std::exception {
 public:

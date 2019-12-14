@@ -10,9 +10,9 @@ void OffsetStack::incTop() {
         throw (OffsetErr(exceptionMessage));
     }
 
-    this->current++;
-    this->offsetStack.pop();
-    this->offsetStack.push(this->current);
+    current++;
+    offsetStack.pop();
+    offsetStack.push(current);
 }
 
 int OffsetStack::getTop(){
@@ -21,7 +21,7 @@ int OffsetStack::getTop(){
         string exceptionMessage("Table is empty");
         throw (OffsetErr(exceptionMessage));
     }
-    return this->offsetStack.top();
+    return offsetStack.top();
 }
 
 void OffsetStack::endScope(){
@@ -34,6 +34,6 @@ void OffsetStack::endScope(){
 }
 
 void OffsetStack::newScope() {
-    this->offsetStack.push( this->current );
+    offsetStack.push( current );
 }
 

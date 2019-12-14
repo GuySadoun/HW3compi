@@ -11,7 +11,8 @@
 
 using std::string;
 using std::stack;
-
+using std::cout;
+using std::endl;
 
 class OffsetErr : public std::exception {
 public:
