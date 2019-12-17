@@ -21,11 +21,11 @@
 %token <str> TRUE FALSE
 %token <str> WHILE RETURN
 %token <str> BREAK CONTINUE
-%token <singlechar> SC COMMA
+%token <str> SC COMMA
 %token <str> STRING ID
 %token <integer> NUM
 
-%right <singlechar> ASSIGN
+%right <str> ASSIGN
 %nonassoc NO_ELSE
 %nonassoc <str> ELSE
 %right <str> IF
@@ -34,10 +34,10 @@
 %left <str> EQUALITY
 %nonassoc <str> LHSS
 %nonassoc <str> RHSS
-%left <singlechar> ADDITIVE
-%left <singlechar> MUL
+%left <str> ADDITIVE
+%left <str> MUL
 %right <str> NOT
-%left <singlechar> LPAREN RPAREN LBRACE RBRACE
+%left <str> LPAREN RPAREN LBRACE RBRACE
 
 %%
 
@@ -130,16 +130,22 @@ EnumType : ENUM ID { printProductionRule(43); }
 
 Exp : LPAREN Exp RPAREN { printProductionRule(44); }
     | Exp ADDITIVE Exp { printProductionRule(45); }
-    | Exp MUL Exp { printProductionRule(45); }
-    | ID { printProductionRule(46); }
+    | Exp MUL Exp { if($$.Exp.$2.str
+                    $$.Exp.val = $1.Exp.val * $3.Exp.val; }
+    | ID { $$.Exp.name = $1.str; }
     | Call { printProductionRule(47); }
-    | NUM { $$.EXP.val = yylval.value; }
-    | NUM B { printProductionRule(49); }
+    | NUM { $$.Exp.val = yylval.value;
+            $$.Exp.type = INT; }
+    | NUM B { $$.Exp.val = yylval.value;
+              $$.Exp.type = BYTE; }
     | STRING { printProductionRule(50); }
     | TRUE { printProductionRule(51); }
     | FALSE { printProductionRule(52); }
     | NOT Exp { printProductionRule(53); }
-    | Exp AND Exp { printProductionRule(54); }
+    | Exp AND Exp { if($1.Exp.isBool() && $3.Exp.isBool());
+                      $$.Exp.val = $1.Exp.val & $3.Exp.val;
+
+                  }
     | Exp OR Exp { printProductionRule(55); }
     | Exp EQUALITY Exp { printProductionRule(56); }
     | Exp RHSS Exp { printProductionRule(56); }

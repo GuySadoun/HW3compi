@@ -5,6 +5,7 @@
 #include "parser.tab.hpp"
 #include "structs.h"
 char *ptr;
+int lineNum;
 %}
 
 
@@ -38,18 +39,56 @@ continue                    return CONTINUE;
 "{"                         return LBRACE;
 "}"                         return RBRACE;
 "="                         return ASSIGN;
-==|!=                       return EQUALITY;
-\<|<=                       return LHSS;
->=|>                        return RHSS;
-\+|\-                       return ADDITIVE;
-\*|"/"                      return MUL;
-[a-zA-Z][a-zA-Z0-9]*	    return ID;
+==|!=                       {
+                                if (yytext = "==")
+                                    yylval.str = "==";
+                                else
+                                    yylval.str = '!=';
+                                return EQUALITY;
+                            }
+\<|<=                       {
+                                if (yytext = "<=")
+                                    yylval.str = "<=";
+                                else
+                                    yylval.str = '<';
+                                return LHSS;
+                            }
+>=|>                        {
+                                if (yytext = ">=")
+                                    yylval.str = ">=";
+                                else
+                                    yylval.str = '>';
+                                return RHSS;
+                            }
+\+|\-                       {
+                                if (yytext = "+")
+                                    yylval.str = "+";
+                                else
+                                    yylval.str = "-";
+                                return ADDITIVE;
+                            }
+\*|"/"                      {
+                                if (yytext = "*")
+                                    yylval.singlechar = '*';
+                                else
+                                    yylval.singlechar = '/';
+                                return MUL;
+                            }
+[a-zA-Z][a-zA-Z0-9]*	    {
+                                yylval.str = yytext;
+                                return ID;
+                            }
 0|[1-9][0-9]*			    {
-                                yylval.value = strtol(yytext, &ptr, 10)
+                                yylval.integer = strtol(yytext, &ptr, 10);
                                 return NUM;
                             }
-"//"[^{\n|\r|\n\r}]*        ;
-\"([^\n\r\"\\]|\\[rnt\"\\])+\" return STRING;
+"//"[^{\n|\r|\n\r}]*        {
+
+                            }
+\"([^\n\r\"\\]|\\[rnt\"\\])+\" {
+                                   yylval.str = yytext;
+                                   return STRING;
+                               }
 
 {whitespace}				;
 .                           yylval = 1;
