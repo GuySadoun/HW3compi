@@ -39,6 +39,7 @@ public:
     Value val;
     string name;
     types type;
+    int lineNum;
 
     bool isBool() return type == BOOL;
     bool isInt() return type == INT;
