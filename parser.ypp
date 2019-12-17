@@ -133,7 +133,7 @@ Exp : LPAREN Exp RPAREN { printProductionRule(44); }
     | Exp MUL Exp { printProductionRule(45); }
     | ID { printProductionRule(46); }
     | Call { printProductionRule(47); }
-    | NUM { printProductionRule(48); }
+    | NUM { $$.EXP.val = yylval.value; }
     | NUM B { printProductionRule(49); }
     | STRING { printProductionRule(50); }
     | TRUE { printProductionRule(51); }

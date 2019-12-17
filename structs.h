@@ -28,6 +28,11 @@ public:
     }
 };
 
+struct exp {
+    int val;
+    string name;
+};
+
 class TypeClass {
     type t;
 public:
@@ -36,15 +41,13 @@ public:
     }
 };
 
-
-
 typedef union {
     int integer;
     char singlechar;
     string str;
     EnumClass enumClass;
     TypeClass typeClass;
-
+    exp EXP;
 } Types;
 
 #define YYSTYPE Types
