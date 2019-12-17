@@ -128,28 +128,59 @@ Type : INT { currRetType = "int"; }
 EnumType : ENUM ID { printProductionRule(43); }
     ;
 
-Exp : LPAREN Exp RPAREN { printProductionRule(44); }
-    | Exp ADDITIVE Exp { printProductionRule(45); }
-    | Exp MUL Exp { if($$.Exp.$2.str
-                    $$.Exp.val = $1.Exp.val * $3.Exp.val; }
+Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
+                          $$.Exp.type = $2.Exp.type; }
+    | Exp ADDITIVE Exp { if($2.str == "+")
+                             $$.Exp.val = $1.Exp.val + $3.Exp.val;
+                         else
+                             $$.Exp.val = $1.Exp.val - $3.Exp.val; }
+    | Exp MUL Exp { if($2.str == "*")
+                        $$.Exp.val = $1.Exp.val * $3.Exp.val;
+                    else
+                        $$.Exp.val = $1.Exp.val / $3.Exp.val;}
     | ID { $$.Exp.name = $1.str; }
     | Call { printProductionRule(47); }
     | NUM { $$.Exp.val = yylval.value;
             $$.Exp.type = INT; }
     | NUM B { $$.Exp.val = yylval.value;
               $$.Exp.type = BYTE; }
-    | STRING { printProductionRule(50); }
-    | TRUE { printProductionRule(51); }
-    | FALSE { printProductionRule(52); }
-    | NOT Exp { printProductionRule(53); }
-    | Exp AND Exp { if($1.Exp.isBool() && $3.Exp.isBool());
-                      $$.Exp.val = $1.Exp.val & $3.Exp.val;
-
+    | STRING { $$.Exp.val = yylval.str;
+               $$.Exp.type = STRING;  }
+    | TRUE { $$.Exp.val = yylval.value;
+             $$.Exp.type = BOOL;  }
+    | FALSE { $$.Exp.val = yylval.value;
+              $$.Exp.type = BOOL; }
+    | NOT Exp { $$.Exp.val = !yylval.value;
+                $$.Exp.type = BOOL; }
+    | Exp AND Exp { if($1.Exp.isBool() && $3.Exp.isBool()){
+                        $$.Exp.val = $1.Exp.val && $3.Exp.val;
+                        $$.Exp.type = BOOL:
+                  }  else
+                        void errorSyn(yylineno);
                   }
-    | Exp OR Exp { printProductionRule(55); }
-    | Exp EQUALITY Exp { printProductionRule(56); }
-    | Exp RHSS Exp { printProductionRule(56); }
-    | Exp LHSS Exp { printProductionRule(56); }
+    | Exp OR Exp { if($1.Exp.isBool() && $3.Exp.isBool());
+                       $$.Exp.val = $1.Exp.val || $3.Exp.val;
+                   else
+                       errorSyn(yylineno);
+                 }
+    | Exp EQUALITY Exp { if (($1.Exp.type == INT && $3.Exp.type == INT) || ($1.Exp.type == BYTE && $3.Exp.type == BYTE) {
+                            $$.type = BOOL;
+                            $$.val = ($1.Exp.val == $3.Exp.val);
+                         } else
+                            errorSyn(yylineno);
+                       }
+    | Exp RHSS Exp { if (($1.Exp.type == INT && $3.Exp.type == INT) || ($1.Exp.type == BYTE && $3.Exp.type == BYTE) {
+                        $$.type = BOOL;
+                        $$.val = ($1.Exp.val == $3.Exp.val);
+                     } else
+                        errorSyn(yylineno);
+                   }
+    | Exp LHSS Exp { if (($1.Exp.type == INT && $3.Exp.type == INT) || ($1.Exp.type == BYTE && $3.Exp.type == BYTE) {
+                        $$.type = BOOL;
+                        $$.val = ($1.Exp.val == $3.Exp.val);
+                     } else
+                        errorSyn(yylineno);
+                   }
     | LPAREN Type RPAREN Exp { printProductionRule(57); }
     ;
 %%

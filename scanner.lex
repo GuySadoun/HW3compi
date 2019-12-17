@@ -5,9 +5,7 @@
 #include "parser.tab.hpp"
 #include "structs.h"
 char *ptr;
-int lineNum;
 %}
-
 
 %option yylineno
 %option noyywrap
@@ -24,8 +22,14 @@ enum                        return ENUM;
 and                         return AND;
 or                          return OR;
 not                         return NOT;
-true                        return TRUE;
-false                       return FALSE;
+true                        {
+                                yylval boolean = true;
+                                return TRUE;
+                            }
+false                       {
+                                yylval boolean = false;
+                                return FALSE;
+                            }
 return                      return RETURN;
 if                          return IF;
 else                        return ELSE;
@@ -82,14 +86,11 @@ continue                    return CONTINUE;
                                 yylval.integer = strtol(yytext, &ptr, 10);
                                 return NUM;
                             }
-"//"[^{\n|\r|\n\r}]*        {
-
-                            }
+"//"[^{\n|\r|\n\r}]*        ;
 \"([^\n\r\"\\]|\\[rnt\"\\])+\" {
                                    yylval.str = yytext;
                                    return STRING;
                                }
-
 {whitespace}				;
 .                           yylval = 1;
 %%
