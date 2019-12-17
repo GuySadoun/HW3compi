@@ -10,6 +10,7 @@
 #include <iostream>
 
 using std::string;
+using std::vector;
 
 enum types {INT, BYTE, BOOL, VOID, STRING, ENUM};
 
@@ -34,18 +35,35 @@ typedef union{
     bool boolean;
 }Value;
 
-class Expression {
-public:
+struct Expression {
+
     Value val;
-    string name;
     types type;
     int lineNum;
 
-    bool isBool() return type == BOOL;
-    bool isInt() return type == INT;
-    bool isByte() return type == BYTE;
-    bool isString() return type == STRING;
-    bool isEnum() return type == ENUM;
+    bool isBool() { return type == BOOL; }
+    bool isInt() { return type == INT; }
+    bool isByte() { return type == BYTE; }
+    bool isString() { return type == STRING; }
+    bool isEnum() { return type == ENUM; }
+};
+
+struct NamedExpression : Expression {
+    string ID;
+};
+
+struct Named{
+    string ID;
+};
+
+struct NamedType : Named{
+    types type;
+};
+
+
+struct ExpList {
+    types type;
+    vector<string> names;
 };
 
 struct Call {
@@ -55,12 +73,36 @@ struct Call {
 };
 
 
+struct Formals{
+    // TODO: what about enums
+    vector<NamedType> params;
+};
+
+struct Statement{
+    // TODO
+};
+
+struct Statements{
+    vector<Statement> statements;
+};
+
+struct FuncDecl {
+    types retType;
+    string ID;
+    Formals formals;
+    Statements statements;
+
+};
+
 typedef union {
     int integer;
     bool boolean;
+    types type;
     string str;
     EnumClass enumClass;
+    Call call;
     Expression Exp;
+    NamedExpression NamedExp;
 
 } Types;
 
