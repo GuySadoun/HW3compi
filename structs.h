@@ -11,7 +11,7 @@
 
 using std::string;
 
-enum type {INT, BYTE, BOOL, VOID};
+enum types {INT, BYTE, BOOL, VOID, STRING, ENUM};
 
 class EnumClass {
     string name;
@@ -28,26 +28,39 @@ public:
     }
 };
 
-struct exp {
-    int val;
+typedef union{
+    string str;
+    int integer;
+    bool boolean;
+}Value;
+
+class Expression {
+public:
+    Value val;
     string name;
+    types type;
+
+    bool isBool() return type == BOOL;
+    bool isInt() return type == INT;
+    bool isByte() return type == BYTE;
+    bool isString() return type == STRING;
+    bool isEnum() return type == ENUM;
 };
 
-class TypeClass {
-    type t;
-public:
-    TypeClass(type type) {
-        t = type;
-    }
+struct Call {
+    string ID;
+    types type;
+    vector<Expression> params;
 };
+
 
 typedef union {
     int integer;
-    char singlechar;
+    bool boolean;
     string str;
     EnumClass enumClass;
-    TypeClass typeClass;
-    exp EXP;
+    Expression Exp;
+
 } Types;
 
 #define YYSTYPE Types
