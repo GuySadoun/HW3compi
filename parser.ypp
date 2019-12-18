@@ -4,6 +4,7 @@
     #include "output.hpp"
     #include "structs.h"
     #include "tableStack.h"
+    #include "semantic.h"
 	using namespace std;
 	using namespace output;
 	extern int yylex();
@@ -11,33 +12,61 @@
 	extern int yylineno;
 	TableStack *symbolTable;
 	int yyerror(const char * message);
-	string currRetType;
-	string currName;
+	#define YYSTYPE Types
 %}
+%union Types{
+     int Integer;
+     bool Boolean;
+     types Type;
+     string Str;
+     EnumClass EnumClass;
+     Call Call;
+     Expression Exp;
+     NamedExpression NamedExp;
+};
+%type <Exp> Exp
+%type <Type> Type
+%type <Funcs> Funcs
+%type <FuncDecl> FuncDecl
+%type <Enums> Enums
+%type <EnumDecl> EnumDecl
+%type <RetType> RetType
+%type <Formals> Formals
+%type <FormalsList> FormalsList
+%type <FormalDecl> FormalDecl
+%type <EnumeratorList> EnumeratorList
+%type <Enumerator> Enumerator
+%type <Statements> Statements
+%type <Statement> Statement
+%type <Call> Call
+%type <ExpList> ExpList
+%type <Type> Type
+%type <EnumType> EnumType
+%type <Exp> Exp
 
-%token <str> BOOL VOID
-%token <enumy> ENUM
-%token <integer> INT BYTE B
-%token <str> TRUE FALSE
-%token <str> WHILE RETURN
-%token <str> BREAK CONTINUE
-%token <str> SC COMMA
-%token <str> STRING ID
-%token <integer> NUM
+%token <Str> BOOL VOID
+%token <EnumClass> ENUM
+%token <Integer> INT BYTE B
+%token <Str> TRUE FALSE
+%token <Str> WHILE RETURN
+%token <Str> BREAK CONTINUE
+%token <Str> SC COMMA
+%token <Str> STRING ID
+%token <Integer> NUM
 
-%right <str> ASSIGN
+%right <Str> ASSIGN
 %nonassoc NO_ELSE
-%nonassoc <str> ELSE
-%right <str> IF
-%left <str> OR
-%left <str> AND
-%left <str> EQUALITY
-%nonassoc <str> LHSS
-%nonassoc <str> RHSS
-%left <str> ADDITIVE
-%left <str> MUL
-%right <str> NOT
-%left <str> LPAREN RPAREN LBRACE RBRACE
+%nonassoc <Str> ELSE
+%right <Str> IF
+%left <Str> OR
+%left <Str> AND
+%left <Str> EQUALITY
+%nonassoc <Str> LHSS
+%nonassoc <Str> RHSS
+%left <Str> ADDITIVE
+%left <Str> MUL
+%right <Str> NOT
+%left <Str> LPAREN RPAREN LBRACE RBRACE
 
 %%
 
@@ -181,7 +210,10 @@ Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
                      } else
                         errorSyn(yylineno);
                    }
-    | LPAREN Type RPAREN Exp { printProductionRule(57); }
+    | LPAREN Type RPAREN Exp {  if ($4.Exp.isEnum() && $2.type == INT) {
+
+                                }
+                             }
     ;
 %%
 

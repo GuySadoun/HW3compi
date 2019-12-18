@@ -66,16 +66,16 @@ continue                    return CONTINUE;
                             }
 \+|\-                       {
                                 if (yytext = "+")
-                                    yylval.str = "+";
+                                    yylval.str = "+"errorSyn(yylineno);;
                                 else
                                     yylval.str = "-";
                                 return ADDITIVE;
                             }
 \*|"/"                      {
                                 if (yytext = "*")
-                                    yylval.singlechar = '*';
+                                    yylval.str = '*';
                                 else
-                                    yylval.singlechar = '/';
+                                    yylval.str = '/';
                                 return MUL;
                             }
 [a-zA-Z][a-zA-Z0-9]*	    {
@@ -83,7 +83,7 @@ continue                    return CONTINUE;
                                 return ID;
                             }
 0|[1-9][0-9]*			    {
-                                yylval.integer = strtol(yytext, &ptr, 10);
+                                yylval.Integer = strtol(yytext, &ptr, 10);
                                 return NUM;
                             }
 "//"[^{\n|\r|\n\r}]*        ;

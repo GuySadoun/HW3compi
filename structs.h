@@ -33,7 +33,7 @@ typedef union{
     string str;
     int integer;
     bool boolean;
-}Value;
+} Value;
 
 struct Expression {
 
