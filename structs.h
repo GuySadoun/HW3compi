@@ -43,6 +43,11 @@ typedef union{
     bool boolean;
 }Value;
 
+struct Program{
+    Enums enumns;
+    Funcs funcs;
+};
+
 class Enums {
     string name;
     std::vector<string> enumarators;
@@ -106,14 +111,14 @@ struct NamedType {
 
 struct ExpList {
     types type;
-    vector<string> names;
+    vector<Expression> Params;
 };
 
 struct Call : lineNum{
     // the returned type ?
     string ID;
     types type;
-    vector<Expression> params;
+    ExpList params;
 };
 
 
