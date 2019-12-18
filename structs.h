@@ -32,11 +32,12 @@ struct ExpList;
 struct EnumType;
 struct Expression;
 
+struct EnumType;
+
 
 struct BasicDeclInfo{
     int lineNum;
 };
-
 
 typedef union{
     string str;
@@ -44,10 +45,6 @@ typedef union{
     bool boolean;
 }Value;
 
-struct Program{
-    Enums enumns;
-    Funcs funcs;
-};
 
 class Enums {
     string name;
@@ -85,6 +82,19 @@ struct Funcs{
     vector<FuncDecl> funcDeclarations;
 };
 
+struct Program{
+    Enums enumns;
+    Funcs funcs;
+};
+
+struct EnumType{
+    string enumType;
+    // the type of enum ID is set to be enumID
+    EnumType(const string id){
+        enumType = "enum"+id;
+    }
+};
+
 struct EnumDecl: BasicDeclInfo{
     EnumType namedType;
     vector<Enumerator> values;
@@ -99,13 +109,7 @@ struct EnumeratorList{
     vector<Enumerator> values;
 };
 
-struct EnumType{
-    string enumType;
-    // the type of enum ID is set to be enumID
-    EnumType(const string id){
-        enumType = "enum"+id;
-    }
-};
+
 
 struct NamedType {
     types type;
@@ -152,8 +156,6 @@ struct FuncDecl : BasicDeclInfo{
     Formals formals;
     Statements statements;
 };
-
-EnumeratorList
 
 typedef union {
     int integer;
