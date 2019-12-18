@@ -14,9 +14,14 @@ ErrorType semantic::binop(Types &target, Types &a, Types &b, string sign, int li
 }
 
 ErrorType semantic::relop(Types &target, Types &a, Types &b, string sign, int lineno) {
-    if ((a.Exp.type == INT && b.Exp.type == INT) || (a.Exp.type == BYTE && b.Exp.type == BYTE) {
-        target.type = BOOL;
-        target.val = (a.Exp.val == b.Exp.val);
+    if ((a.Exp.isInt() && b.Exp.isInt()) || (a.Exp.isByte() && b.Exp.isByte())) {
+        target.Exp.type = BOOL;
+        target.Exp.val.boolean = (a.Exp.val.boolean == b.Exp.val.boolean);
     } else
-        errorSyn(yylineno);
+        errorSyn(lineno);
 }
+
+ErrorType semantic::logicop(Types &target, Types &a, Types &b, string sign, int lineno) {
+    return LEXERR;
+}
+

@@ -159,14 +159,8 @@ EnumType : ENUM ID { printProductionRule(43); }
 
 Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
                           $$.Exp.type = $2.Exp.type; }
-    | Exp ADDITIVE Exp { if($2.str == "+")
-                             $$.Exp.val = $1.Exp.val + $3.Exp.val;
-                         else
-                             $$.Exp.val = $1.Exp.val - $3.Exp.val; }
-    | Exp MUL Exp { if($2.str == "*")
-                        $$.Exp.val = $1.Exp.val * $3.Exp.val;
-                    else
-                        $$.Exp.val = $1.Exp.val / $3.Exp.val;}
+    | Exp ADDITIVE Exp { semantic::binop($$, $1, $3, $2.str, yylineno); }
+    | Exp MUL Exp { semantic::binop($$, $1, $3, $2.str, yylineno);}
     | ID { $$.Exp.name = $1.str; }
     | Call { printProductionRule(47); }
     | NUM { $$.Exp.val = yylval.value;
@@ -179,41 +173,13 @@ Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
              $$.Exp.type = BOOL;  }
     | FALSE { $$.Exp.val = yylval.value;
               $$.Exp.type = BOOL; }
-    | NOT Exp { $$.Exp.val = !yylval.value;
-                $$.Exp.type = BOOL; }
-    | Exp AND Exp { if($1.Exp.isBool() && $3.Exp.isBool()){
-                        $$.Exp.val = $1.Exp.val && $3.Exp.val;
-                        $$.Exp.type = BOOL:
-                  }  else
-                        void errorSyn(yylineno);
-                  }
-    | Exp OR Exp { if($1.Exp.isBool() && $3.Exp.isBool());
-                       $$.Exp.val = $1.Exp.val || $3.Exp.val;
-                   else
-                       errorSyn(yylineno);
-                 }
-    | Exp EQUALITY Exp { if (($1.Exp.type == INT && $3.Exp.type == INT) || ($1.Exp.type == BYTE && $3.Exp.type == BYTE) {
-                            $$.type = BOOL;
-                            $$.val = ($1.Exp.val == $3.Exp.val);
-                         } else
-                            errorSyn(yylineno);
-                       }
-    | Exp RHSS Exp { if (($1.Exp.type == INT && $3.Exp.type == INT) || ($1.Exp.type == BYTE && $3.Exp.type == BYTE) {
-                        $$.type = BOOL;
-                        $$.val = ($1.Exp.val == $3.Exp.val);
-                     } else
-                        errorSyn(yylineno);
-                   }
-    | Exp LHSS Exp { if (($1.Exp.type == INT && $3.Exp.type == INT) || ($1.Exp.type == BYTE && $3.Exp.type == BYTE) {
-                        $$.type = BOOL;
-                        $$.val = ($1.Exp.val == $3.Exp.val);
-                     } else
-                        errorSyn(yylineno);
-                   }
-    | LPAREN Type RPAREN Exp {  if ($4.Exp.isEnum() && $2.type == INT) {
-
-                                }
-                             }
+    | NOT Exp { semantic::logicop($$, $2, $2, $1.str, yylineno); }
+    | Exp AND Exp { semantic::logicop($$, $1, $3, $2.str, yylineno); }
+    | Exp OR Exp { semantic::logicop($$, $1, $3, $2.str, yylineno); }
+    | Exp EQUALITY Exp { semantic::relop($$, $1, $3, $2.str, yylineno); }
+    | Exp RHSS Exp { semantic::relop($$, $1, $3, $2.str, yylineno); }
+    | Exp LHSS Exp { semantic::relop($$, $1, $3, $2.str, yylineno); }
+    | LPAREN Type RPAREN Exp {  semantic::cast($$, $1, $3, $2.str, yylineno); }
     ;
 %%
 
