@@ -14,11 +14,40 @@ using std::vector;
 
 enum types {INT, BYTE, BOOL, VOID, STRING, ENUM};
 
-class EnumClass {
+struct Program;
+class Enums;
+struct Funcs;
+struct FuncDecl;
+struct EnumDecl;
+struct RetType;
+struct Formals;
+struct FormalsList;
+struct FormalDecl;
+struct EnumeratorList;
+struct Enumerator;
+struct Statements;
+struct Statement;
+struct Call;
+struct ExpList;
+struct EnumType;
+struct Expression;
+
+
+struct lineNum{
+    int lineNum;
+};
+
+typedef union{
+    string str;
+    int integer;
+    bool boolean;
+}Value;
+
+class Enums {
     string name;
     std::vector<string> enumarators;
 public:
-    EnumClass(string str) {
+    Enums(string str) {
         name = "enum" + str;
     }
     string getName() {
@@ -29,51 +58,66 @@ public:
     }
 };
 
-typedef union{
-    string str;
-    int integer;
-    bool boolean;
-} Value;
-
-struct Expression {
+struct Expression : lineNum{
 
     Value val;
     types type;
-    int lineNum;
-
     bool isBool() { return type == BOOL; }
     bool isInt() { return type == INT; }
     bool isByte() { return type == BYTE; }
     bool isString() { return type == STRING; }
     bool isEnum() { return type == ENUM; }
+
+    // casting?
 };
 
-struct NamedExpression : Expression {
-    string ID;
-};
-
-struct Named{
-    string ID;
-};
-
-struct NamedType : Named{
+struct RetType {
     types type;
 };
 
+struct Funcs{
+    vector<FuncDecl> funcDeclarations;
+};
+
+struct EnumDecl: lineNum{
+
+    string name;
+    vector<Enumerator>;
+};
+
+struct Enumerator{
+    int num;
+    string value;
+};
+
+struct EnumType{
+    string enumType;
+
+    // the type of enum ID is set to be enumID
+    EnumType(string id){
+        enumType = "enum"+id;
+    }
+};
+
+struct NamedType {
+    types type;
+    string id;
+};
 
 struct ExpList {
     types type;
     vector<string> names;
 };
 
-struct Call {
+struct Call : lineNum{
+    // the returned type ?
     string ID;
     types type;
     vector<Expression> params;
 };
 
 
-struct Formals{
+struct Formals : lineNum{
     // TODO: what about enums
     vector<NamedType> params;
 };
@@ -86,12 +130,11 @@ struct Statements{
     vector<Statement> statements;
 };
 
-struct FuncDecl {
+struct FuncDecl : lineNum{
     types retType;
     string ID;
     Formals formals;
     Statements statements;
-
 };
 
 typedef union {
@@ -99,10 +142,10 @@ typedef union {
     bool boolean;
     types type;
     string str;
-    EnumClass enumClass;
+    Enums enumClass;
     Call call;
     Expression Exp;
-    NamedExpression NamedExp;
+
 
 } Types;
 
