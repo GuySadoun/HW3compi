@@ -5,7 +5,7 @@
 #include "semantic.h"
 using namespace output;
 
-ErrorType semantic::binop(Types &target, Types &a, Types &b, string sign, int lineno) {
+void semantic::binop(Types &target, Types &a, Types &b, string sign, int lineno) {
     if(a.Exp.isBool() && b.Exp.isBool()) {
         target.Exp.val.boolean = a.Exp.val.boolean && b.Exp.val.boolean;
         target.Exp.type = BOOL;
@@ -13,7 +13,7 @@ ErrorType semantic::binop(Types &target, Types &a, Types &b, string sign, int li
         errorSyn(lineno);
 }
 
-ErrorType semantic::relop(Types &target, Types &a, Types &b, string sign, int lineno) {
+void semantic::relop(Types &target, Types &a, Types &b, string sign, int lineno) {
     if ((a.Exp.isInt() && b.Exp.isInt()) || (a.Exp.isByte() && b.Exp.isByte())) {
         target.Exp.type = BOOL;
         target.Exp.val.boolean = (a.Exp.val.boolean == b.Exp.val.boolean);
@@ -21,7 +21,11 @@ ErrorType semantic::relop(Types &target, Types &a, Types &b, string sign, int li
         errorSyn(lineno);
 }
 
-ErrorType semantic::logicop(Types &target, Types &a, Types &b, string sign, int lineno) {
-    return LEXERR;
+void semantic::logicop(Types &target, Types &a, Types &b, string sign, int lineno) {
+
+}
+
+void semantic::call(Types &target, Types &call, int lineno) {
+
 }
 
