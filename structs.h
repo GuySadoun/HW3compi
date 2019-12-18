@@ -33,9 +33,10 @@ struct EnumType;
 struct Expression;
 
 
-struct lineNum{
+struct BasicDeclInfo{
     int lineNum;
 };
+
 
 typedef union{
     string str;
@@ -63,7 +64,7 @@ public:
     }
 };
 
-struct Expression : lineNum{
+struct Expression : BasicDeclInfo{
 
     Value val;
     types type;
@@ -84,10 +85,9 @@ struct Funcs{
     vector<FuncDecl> funcDeclarations;
 };
 
-struct EnumDecl: lineNum{
-
-    string name;
-    vector<Enumerator>;
+struct EnumDecl: BasicDeclInfo{
+    EnumType namedType;
+    vector<Enumerator> values;
 };
 
 struct Enumerator{
@@ -95,11 +95,14 @@ struct Enumerator{
     string value;
 };
 
+struct EnumeratorList{
+    vector<Enumerator> values;
+};
+
 struct EnumType{
     string enumType;
-
     // the type of enum ID is set to be enumID
-    EnumType(string id){
+    EnumType(const string id){
         enumType = "enum"+id;
     }
 };
@@ -114,17 +117,25 @@ struct ExpList {
     vector<Expression> Params;
 };
 
-struct Call : lineNum{
+struct Call : BasicDeclInfo{
     // the returned type ?
-    string ID;
+    string name;
     types type;
     ExpList params;
 };
 
 
-struct Formals : lineNum{
+struct Formals : BasicDeclInfo{
     // TODO: what about enums
     vector<NamedType> params;
+};
+
+struct FormalDecl : BasicDeclInfo{
+    types type;
+};
+
+struct FormalsList{
+    vector<FormalDecl> FunDeclParams;
 };
 
 struct Statement{
@@ -135,23 +146,23 @@ struct Statements{
     vector<Statement> statements;
 };
 
-struct FuncDecl : lineNum{
+struct FuncDecl : BasicDeclInfo{
     types retType;
-    string ID;
+    string name;
     Formals formals;
     Statements statements;
 };
+
+EnumeratorList
 
 typedef union {
     int integer;
     bool boolean;
     types type;
     string str;
-    Enums enumClass;
+    Enums enums;
     Call call;
     Expression Exp;
-
-
 } Types;
 
 #define YYSTYPE Types

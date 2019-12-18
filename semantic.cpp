@@ -29,3 +29,9 @@ void semantic::call(Types &target, Types &call, int lineno) {
 
 }
 
+void semantic::enumdecl(Types &target, string name, string enumValues, int lineno){
+    target.Exp.val.boolean = a.Exp.val.boolean && b.Exp.val.boolean;
+    target.Exp.type = BOOL;
+
+}
+

@@ -89,7 +89,7 @@ Enums : %empty { printProductionRule(5); }
     | EnumDecl Enums { printProductionRule(6); }
     ;
 
-EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { printProductionRule(7); }
+EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { sematic::enumdecl( $$, $2, $4, yylineno) }
     ;
 
 RetType : Type { printProductionRule(8); }
