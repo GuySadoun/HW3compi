@@ -89,7 +89,7 @@ Enums : %empty { printProductionRule(5); }
     | EnumDecl Enums { printProductionRule(6); }
     ;
 
-EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { sematic::enumdecl( $$, $2, $4, yylineno) }
+EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { printProductionRule(7); }
     ;
 
 RetType : Type { printProductionRule(8); }
@@ -161,12 +161,12 @@ Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
                           $$.Exp.type = $2.Exp.type; }
     | Exp ADDITIVE Exp { semantic::binop($$, $1, $3, $2.str, yylineno); }
     | Exp MUL Exp { semantic::binop($$, $1, $3, $2.str, yylineno);}
-    | ID { $$.Exp.name = $1.str; }
-    | Call { printProductionRule(47); }
+    | ID { $$.Exp.name = $1.str;
+           $$.Exp.type = STRING; }
+    | Call { semantic::call(Types &target, Types &call, yylineno); }
     | NUM { $$.Exp.val = yylval.value;
             $$.Exp.type = INT; }
-    | NUM B { $$.Exp.val = yylval.value;
-              $$.Exp.type = BYTE; }
+    | NUM B { semantic::bytecheck($$, $1, yylineno); }
     | STRING { $$.Exp.val = yylval.str;
                $$.Exp.type = STRING;  }
     | TRUE { $$.Exp.val = yylval.value;
