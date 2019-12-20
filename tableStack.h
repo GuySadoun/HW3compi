@@ -21,22 +21,22 @@ public:
     const string m_msg;
 };
 
-class symbolTable {
-    class Table {
-        struct TableEntry {
-            string name;
-            string type;
-            int offset;
-            Types val;
-            TableEntry(string name, string type, int offset) : name(name), type(type), offset(offset) {}
-        };
-        vector<TableEntry> scopeTable;
-    public:
-        Table() = default;
-        void newLine(string name, string type, int off);
-        bool existInTable(string name);
-        ~Table();
+struct Table {
+    struct TableEntry {
+        string name;
+        string type;
+        int offset;
+        Types val;
+
+        TableEntry(string name, string type, int offset) : name(name), type(type), offset(offset) {}
     };
+    vector<TableEntry*> scopeTable;
+    Table() = default;
+    void newLine(string name, string type, int off);
+    bool existInTable(string name);
+    ~Table();
+};
+class symbolTable {
     vector<Table*> tablesStack;
     OffsetStack offsetStack;
 public:
@@ -45,7 +45,8 @@ public:
     void newScope();
     void endScope();
     bool exist(string symbol);
-    Types findSymbol(string symbol);
+    Table::TableEntry* getEntry(string symbol);
+    string findStringSymbol(string symbol);
 };
 
 #endif //HW3COMPI_TABLESTACK_H

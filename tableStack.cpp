@@ -60,6 +60,18 @@ bool symbolTable::exist(string str) {
     return false;
 }
 
+string symbolTable::findStringSymbol(string symbol) {
+    for (auto table : tablesStack) {
+        for (auto entry : table->scopeTable) {
+
+        }
+    }
+}
+
+Table::TableEntry *symbolTable::getEntry(string symbol) {
+    return nullptr;
+}
+
 Types symbolTable::findSymbol(string symbol) {
     Types result;
     return result;

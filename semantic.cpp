@@ -112,8 +112,3 @@ void semantic::enumeratorlist1(Types &target, Types& enumerator, int lineno) {
 void semantic::enumeratorlist2(Types &target, Types &enumeratorList, Types& enumerator, int lineno) {
     target.enumeratorList(enumeratorList, enumerator);
 }
-
-
-
-
-
