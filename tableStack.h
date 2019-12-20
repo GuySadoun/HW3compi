@@ -29,20 +29,21 @@ struct Table {
         int offset;
         Types &val;
 
-        TableEntry(string name, types type, int offset, Types & val) :
-                        name(name), type(type), offset(offset), val(val) {}
+        TableEntry(string name, types type, string typeStr, int offset, Types & val) :
+                        name(name), type(type), typeStr(typeStr), offset(offset), val(val) {}
     };
     vector<TableEntry*> scopeTable;
     Table() = default;
     void newLine(string name, types type, int off, Types & value);
     bool existInTable(const string& name);
+    string typeToStr(types t);
     ~Table();
 };
 class symbolTable {
     vector<Table*> tablesStack;
     OffsetStack offsetStack;
     void checkTableEmpty( const string& expMessage);
-    string typeToStr(types t);
+
 public:
 
     symbolTable() = default;

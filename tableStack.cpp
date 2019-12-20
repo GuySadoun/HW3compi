@@ -7,8 +7,9 @@
 
 void Table::newLine(string name, types type, int off, Types &value) {
 
+
     scopeTable.insert( scopeTable.begin(),
-            new TableEntry(std::move(name), type, off, value));
+            new TableEntry(std::move(name), type, typeToStr(type), off, value));
 }
 
 Table::~Table() {
@@ -24,29 +25,7 @@ bool Table::existInTable(const string& name) {
     return false;
 }
 
-void symbolTable::checkTableEmpty(const string& expMessage) {
-    if (tablesStack.empty()) {
-        string exceptionMessage("empty table");
-        throw (TblErr(exceptionMessage));
-    }
-}
-
-void symbolTable::newScope() {
-    auto it = tablesStack.begin();
-    offsetStack.newScope();
-    tablesStack.insert(it, new Table);
-}
-
-void symbolTable::endScope() {
-
-    checkTableEmpty("end scope with empty stack exception");
-
-    delete *(tablesStack.begin());
-    tablesStack.erase(tablesStack.begin());
-    offsetStack.endScope();
-}
-
-string symbolTable::typeToStr(types type){
+string Table::typeToStr(types type){
 
     string typeStr;
     switch(type) {
@@ -77,15 +56,37 @@ string symbolTable::typeToStr(types type){
     return typeStr;
 }
 
-void symbolTable::newVar(const string& symbol, types type, Types &value, int lineNum) {
 
+void symbolTable::checkTableEmpty(const string& expMessage) {
+    if (tablesStack.empty()) {
+        string exceptionMessage("empty table");
+        throw (TblErr(exceptionMessage));
+    }
+}
+
+void symbolTable::newScope() {
+    auto it = tablesStack.begin();
+    offsetStack.newScope();
+    tablesStack.insert(it, new Table);
+}
+
+void symbolTable::endScope() {
+
+    checkTableEmpty("end scope with empty stack exception");
+
+    delete *(tablesStack.begin());
+    tablesStack.erase(tablesStack.begin());
+    offsetStack.endScope();
+}
+
+void symbolTable::newVar(const string& symbol, types type, Types &value, int lineNum) {
 
     for (auto table : tablesStack) {
         if (table->existInTable(symbol)) {
             output::errorDef( lineNum, symbol);
         }
     }
-    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value);
+    tablesStack.front()->newLine(symbol, type,  ,offsetStack.getTop(), value);
     offsetStack.incTop();
 }
 
