@@ -84,12 +84,11 @@ struct EnumDecl : BasicDeclInfo {
     }
 };
 
-class Expression : public BasicDeclInfo {
+struct Expression : BasicDeclInfo {
 
     Value val;
     types type;
 
-public:
     bool isBool() { return type == BOOL; }
 
     bool isInt() { return type == INT; }
