@@ -25,7 +25,7 @@ class symbolTable {
     class Table {
         struct TableEntry {
             string name;
-            string type;
+            types type;
             int offset;
             Types val;
             TableEntry(string name, string type, int offset) : name(name), type(type), offset(offset) {}
@@ -39,13 +39,17 @@ class symbolTable {
     };
     vector<Table*> tablesStack;
     OffsetStack offsetStack;
+    unordered_map<string, Types> symbolTableValues;
+
 public:
     symbolTable() = default;
-    void newVar(string name, string type);
+    void newVar(string symbol, string type, Types value);
+    void updateSymbolValue( string symbol, Types value );
+    types getType( string symbol);
     void newScope();
     void endScope();
     bool exist(string symbol);
-    Types findSymbol(string symbol);
+    Types &findSymbol(string symbol);
 };
 
 #endif //HW3COMPI_TABLESTACK_H

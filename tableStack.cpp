@@ -25,18 +25,19 @@ bool symbolTable::Table::existInTable(string name) {
     return false;
 }
 
-void symbolTable::newVar(string name, string type) {
+void symbolTable::newVar( string symbol, string type, Types value ) {
     if (tablesStack.empty()) {
         string exceptionMessage("new var with empty");
         throw (TblErr(exceptionMessage));
     }
     for (auto table : tablesStack) {
-        if (table->existInTable(name)) {
+        if (table->existInTable(symbol)) {
             string exceptionMessage("already exist in scopeTable");
             throw (TblErr(exceptionMessage));
         }
     }
-    tablesStack.front()->newLine(name, type, offsetStack.getTop());
+    tablesStack.front()->newLine(symbol, type, offsetStack.getTop());
+    //symbolTableValues[symbol] = value;
     offsetStack.incTop();
 }
 
@@ -57,6 +58,9 @@ void symbolTable::endScope() {
 }
 
 bool symbolTable::exist(string str) {
+
+    // go lifo in the vector, look for the symbol
+
     return false;
 }
 
