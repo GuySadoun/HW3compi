@@ -152,13 +152,14 @@ void semantic::enumType(Types &target, string name, int lineno) {
     target.enumType = eType;
 }
 
-void semantic::expList(Types &target, ExpList expList, Types &exp) {
-    vector<Expression> vec(expList.args);
-    target.expList.args = vec;
+void semantic::expList(Types &target, Types &expList, Types &exp) {
+    ExpList expList1(expList.expList, exp.exp);
+    target.expList = expList1;
 }
 
-void semantic::expList(Types &target, Types &exp) {
-
+void semantic::expList(Types &target, Types & expList) {
+    ExpList expList1(expList.expList);
+    target.expList = expList1;
 }
 
 

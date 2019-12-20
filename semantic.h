@@ -51,6 +51,6 @@ namespace semantic {
 
     void expList(Types &target, Types &exp);
 
-    void expList(Types &target, ExpList expList, Types &exp);
+    void expList(Types &target, Types &expList, Types &exp);
 }
 #endif //HW3COMPI_SEMANTIC_H
