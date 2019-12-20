@@ -24,7 +24,7 @@ public:
 struct Table {
     struct TableEntry {
         string name;
-        string type;
+        types type;
         int offset;
         Types val;
 
@@ -32,7 +32,7 @@ struct Table {
     };
     vector<TableEntry*> scopeTable;
     Table() = default;
-    void newLine(string name, string type, int off);
+    void newLine(string name, types type, int off);
     bool existInTable(string name);
     ~Table();
 };
@@ -45,9 +45,10 @@ public:
     void newScope();
     void endScope();
     bool exist(string symbol);
+    string getStringVal(string symbol);
     int getIntegerVal(string symbol);
-    Table::TableEntry* getEntry(string symbol);
-    string findStringSymbol(string symbol);
+    bool getBoolVal(string symbol);
+    Call getCallVal( string symbol );
 };
 
 #endif //HW3COMPI_TABLESTACK_H

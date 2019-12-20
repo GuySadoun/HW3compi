@@ -4,7 +4,7 @@
 
 #include "tableStack.h"
 
-void symbolTable::Table::newLine(string name, string type, int off) {
+void Table::newLine(string name, string type, int off) {
     if (scopeTable.empty()) {
         string exceptionMessage("new line to empty scopeTable");
         throw (TblErr(exceptionMessage));
@@ -20,17 +20,9 @@ symbolTable::Table::~Table() {
 
 bool symbolTable::Table::existInTable(string name) {
     for (auto &entry : scopeTable) {
-        if (entry.name == name) return true;
+        if (entry->name == name) return true;
     }
     return false;
-}
-
-Table::TableEntry Table::getEntryfromScope(string name) {
-
-    for (auto &entry : scopeTable) {
-        if (entry.name == name) return entry;
-    }
-   // TODO if entry not found
 }
 
 
@@ -81,16 +73,62 @@ bool symbolTable::exist(string str) {
     return false;
 }
 
-string symbolTable::findStringSymbol(string symbol) {
+string symbolTable::getStringVal(string symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
-
+            if(( entry->name == symbol) && (entry->type == "string" )) {
+                return entry->val.str;
+            }
+            else {
+                // TODO throw the right exception
+                string exceptionMessage("error Undef");
+                throw (TblErr(exceptionMessage));
+            }
         }
     }
 }
 
-Table::TableEntry *symbolTable::getEntry(string symbol) {
+Enumerator symbolTable::getEnumeratorVal(string symbol) {
+    for (auto table : tablesStack) {
+        for (auto entry : table->scopeTable) {
+            if(( entry->name == symbol) && (entry->type == "string" )) {
+                return entry->val.enumerator;
+            }
+            else {
+                // TODO throw the right exception
+                string exceptionMessage("error Undef");
+                throw (TblErr(exceptionMessage));
+            }
+        }
+    }
+}
+
+EnumeratorList symbolTable::getEnumListVal(string symbol) {
+    return EnumeratorList(EnumeratorList(), Enumerator());
+}
+
+types symbolTable::getTypeVal(string symbol) {
+    return INT;
+}
+
+bool symbolTable::getBoolVal(string symbol) {
+    return false;
+}
+
+int symbolTable::getIntegerVal(string symbol) {
+    return 0;
+}
+
+Expression *symbolTable::getExpVal(string symbol) {
     return nullptr;
+}
+
+Call symbolTable::getCallVal(string symbol) {
+    return Call();
+}
+
+string symbolTable::valuesToString(Types symbolValue) {
+    return (string)symbolValue;
 }
 
 Types symbolTable::findSymbol(string symbol) {
@@ -116,4 +154,28 @@ TableEntry getSymbolEntry( string name ){
     for (auto table : tablesStack) {
     }
 }
+
+
+//bool symbolTable::exist(string str) {
+//    // go lifo in the vector, look for the symbol
+//    bool exists = false;
+//    for (auto table : tablesStack) {
+//        if (table->existInTable(symbol))
+//            exists = true;
+//    }
+//    return exists;
+//
+//}
+//Types & symbolTable::findSymbol(string symbol) {
+//
+//    return getSymbolEntry(symbol).val;
+//}
+//
+//types symbolTable::getType( string symbol){
+//    return getSymbolEntry(symbol).type;
+//}
+//
+//void symbolTable::updateSymbolValue( string symbol, Types value ){
+//    getSymbolEntry(symbol).val = value;
+//}
 
