@@ -40,16 +40,24 @@ struct Table {
 class symbolTable {
     vector<Table*> tablesStack;
     OffsetStack offsetStack;
+    void checkTableEmpty( string expMessage);
 public:
+
     symbolTable() = default;
-    void newVar(string name, types type, Types & value);
     void newScope();
     void endScope();
-    bool exist(string symbol);
+
+    void newVar(string name, types type, Types & value);
+    void updateSymbolValue(string name, Types value);
+
     string getStringVal(string symbol);
     int getIntegerVal(string symbol);
     bool getBoolVal(string symbol);
     FuncDecl getFuncVal(string symbol);
+
+    bool exist(string symbol);
+
+
 };
 
 #endif //HW3COMPI_TABLESTACK_H

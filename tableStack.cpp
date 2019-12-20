@@ -3,6 +3,7 @@
 //
 
 #include "tableStack.h"
+
 void Table::newLine(string name, types type, int off, Types &value) {
 
     if (scopeTable.empty()) {
@@ -11,9 +12,10 @@ void Table::newLine(string name, types type, int off, Types &value) {
     }
 
     // TODO no matching member function for call to push_back
-    scopeTable.push_back(*(new TableEntry(name, type, off, value )));
-
+    scopeTable.insert( scopeTable.begin(),
+            new TableEntry(name, type, off, value));
 }
+
 Table::~Table() {
     for (auto entry : scopeTable) {
         delete &entry;
@@ -27,21 +29,11 @@ bool Table::existInTable(string name) {
     return false;
 }
 
-
-
-void symbolTable::newVar( string symbol, types type, Types & value ) {
+void symbolTable::checkTableEmpty(string expMessage) {
     if (tablesStack.empty()) {
-        string exceptionMessage("new var with empty");
+        string exceptionMessage("empty table");
         throw (TblErr(exceptionMessage));
     }
-    for (auto table : tablesStack) {
-        if (table->existInTable(symbol)) {
-            string exceptionMessage("already exist in scopeTable");
-            throw (TblErr(exceptionMessage));
-        }
-    }
-    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value );
-    offsetStack.incTop();
 }
 
 void symbolTable::newScope() {
@@ -51,22 +43,64 @@ void symbolTable::newScope() {
 }
 
 void symbolTable::endScope() {
-    if (tablesStack.empty()) {
-        string exceptionMessage("end scope with empty stack");
-        throw (TblErr(exceptionMessage));
-    }
+
+    checkTableEmpty("end scope with empty stack exception");
+
     delete *(tablesStack.begin());
     tablesStack.erase(tablesStack.begin());
     offsetStack.endScope();
 }
 
+void symbolTable::newVar(string symbol, types type, Types &value) {
+
+    for (auto table : tablesStack) {
+        if (table->existInTable(symbol)) {
+            string exceptionMessage("already exist in scopeTable");
+            throw (TblErr(exceptionMessage));
+        }
+    }
+    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value);
+    offsetStack.incTop();
+}
+
+void symbolTable::updateSymbolValue(string symbol, Types value) {
+
+    for (auto table : tablesStack) {
+        if (table->existInTable(symbol)) {
+            for (auto entry : table->scopeTable) {
+                if (entry->name == symbol) {
+
+                    switch (entry->type) {
+                        case INT:
+                            entry->val.integer = value.integer;
+                            break;
+                        case BYTE:
+                            entry->val.integer = value.integer;
+                            break;
+                        case BOOL:
+                            entry->val.boolean = value.boolean;
+                            break;
+                        case STRING:
+                            entry->val.str = value.str;
+                            break;
+                        case ENUM:
+                            break;
+                        case FUNC:
+                            break;
+                    }
+                }
+            }
+        }
+    }
+    throw (TblErr("errorUndef"));
+}
+
 string symbolTable::getStringVal(string symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
-            if(( entry->name == symbol) && (entry->type == STRING )) {
+            if ((entry->name == symbol) && (entry->type == STRING)) {
                 return entry->val.str;
-            }
-            else {
+            } else {
                 // TODO throw the right exception
                 throw (TblErr("error Undefined"));
             }
@@ -77,10 +111,9 @@ string symbolTable::getStringVal(string symbol) {
 bool symbolTable::getBoolVal(string symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
-            if(( entry->name == symbol) && (entry->type == BOOL)) {
+            if ((entry->name == symbol) && (entry->type == BOOL)) {
                 return entry->val.boolean;
-            }
-            else {
+            } else {
                 // TODO throw the right exception
                 throw (TblErr("error Undefined"));
             }
@@ -91,10 +124,9 @@ bool symbolTable::getBoolVal(string symbol) {
 int symbolTable::getIntegerVal(string symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
-            if(( entry->name == symbol) && (entry->type == INT )) {
+            if ((entry->name == symbol) && (entry->type == INT)) {
                 return entry->val.integer;
-            }
-            else {
+            } else {
                 // TODO throw the right exception
                 throw (TblErr("error Undefined"));
             }
@@ -105,25 +137,16 @@ int symbolTable::getIntegerVal(string symbol) {
 FuncDecl symbolTable::getFuncVal(string symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
-            if(( entry->name == symbol) && (entry->type == FUNC )) {
+            if ((entry->name == symbol) && (entry->type == FUNC)) {
                 // TODO: add FuncDecl to union types
                 return FuncDecl();
                 //return entry->val.func;
-            }
-            else {
+            } else {
                 // TODO throw the right exception
                 throw (TblErr("error Undefined"));
             }
         }
     }
-}
-
-types getType( string symbol){
-    return BOOL;
-}
-
-void updateSymbolValue( string symbol, Types value ){
-
 }
 
 bool symbolTable::exist(string symbol) {
@@ -137,16 +160,4 @@ bool symbolTable::exist(string symbol) {
     return exists;
 
 }
-//Types & symbolTable::findSymbol(string symbol) {
-//
-//    return getSymbolEntry(symbol).val;
-//}
-//
-//types symbolTable::getType( string symbol){
-//    return getSymbolEntry(symbol).type;
-//}
-//
-//void symbolTable::updateSymbolValue( string symbol, Types value ){
-//    getSymbolEntry(symbol).val = value;
-//}
 
