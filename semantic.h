@@ -32,8 +32,8 @@ namespace semantic {
     void cast(Types& target, Types &a, Types &b, int lineno);
     void call(Types& target, Types &call, int lineno);
     void bytecheck(Types& target, Types &byte, int lineno);
-    void enumdecl(Types &target, string name, string enumValues, int lineno);
     void enumeratorlist1(Types &target, Types& enumerator, int lineno);
     void enumeratorlist2(Types &target, Types& enumeratorList, Types& enumerator, int lineno);
+    void enumdecl(Types &target, string name, EnumeratorList enumValues, int lineno);
 }
 #endif //HW3COMPI_SEMANTIC_H

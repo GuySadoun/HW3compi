@@ -90,8 +90,8 @@ Enums : %empty { printProductionRule(5); }
     ;
 
 EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC {
-    semantic::enumdecl($$, $2, $4, yylineno);
- }
+        semantic::enumdecl($$, $2, $4, yylineno);
+    }
     ;
 
 RetType : Type { printProductionRule(8); }

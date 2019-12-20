@@ -17,17 +17,7 @@ using std::string;
 using std::vector;
 
 enum types {
-    INT, BYTE, BOOL, VOID, STRING, ENUM
-};
-enum unionHelper {
-    Int_type,
-    Bool_type,
-    Types_type;
-    EnumeratorList_type,
-    Enumerator_type,
-    String_type,
-    Call_type,
-    Expression_type
+    INT, BYTE, BOOL, VOID, STRING, ENUM, FUNC
 };
 
 enum statType {
@@ -85,10 +75,10 @@ struct Enumerator {
 
 struct EnumeratorList {
     unordered_map<string, Enumerator> values;
-    EnumeratorList(EnumeratorList elist, Enumerator e) : values(std::move(elist.values)) {
+    EnumeratorList(Enumerator e) {
         values[e.enumName] = e;
     }
-    EnumeratorList(Enumerator e) {
+    EnumeratorList(EnumeratorList elist, Enumerator e) : values(std::move(elist.values)) {
         values[e.enumName] = e;
     }
 };
@@ -96,6 +86,10 @@ struct EnumeratorList {
 struct EnumDecl : BasicDeclInfo {
     EnumType namedType;
     EnumeratorList values;
+    EnumDecl(string name, EnumeratorList vals) {
+        namedType = EnumType(name);
+        values = vals;
+    }
 };
 
 struct Expression : BasicDeclInfo {
@@ -185,6 +179,7 @@ typedef union {
     string str;
     Call call;
     Expression Exp;
+    EnumDecl enumDecl;
 } Types;
 
 extern Enums declared;

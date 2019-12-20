@@ -45,6 +45,7 @@ public:
     void newScope();
     void endScope();
     bool exist(string symbol);
+    int getIntegerVal(string symbol);
     Table::TableEntry* getEntry(string symbol);
     string findStringSymbol(string symbol);
 };

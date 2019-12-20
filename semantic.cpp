@@ -104,23 +104,24 @@ void semantic::cast(Types &target, Types &to, Types &exp, int lineno) {
         errorDef(lineno, exp.Exp.id);
         exit(1);
     }
-    if (symbolTable.getType(exp.Exp.id) != )
     target.Exp.type = INT;
-    target.Exp.val.integer = symbolTable.findSymbol(exp.Exp.id).integer;
-
+    target.Exp.val.integer = symbolTable.getIntegerVal(exp.Exp.id);
 }
 
 void semantic::enumdecl( Types &target, string name, EnumeratorList enumValues, int lineno){
-    //target.Exp.type( EnumType( name )),
-    //target.Exp.values = enumValues;
+    EnumDecl enumDecl(name, enumValues);
+    target.enumDecl = enumDecl;
+    declared.declaredEnums[enumDecl.namedType] = enumDecl;
 }
 
 void semantic::enumeratorlist1(Types &target, Types& enumerator, int lineno) {
-    target.enumeratorList(enumerator);
+    EnumeratorList enumeratorList(enumerator.enumerator);
+    target.enumeratorList = enumeratorList;
 }
 
 void semantic::enumeratorlist2(Types &target, Types &enumeratorList, Types& enumerator, int lineno) {
-    target.enumeratorList(enumeratorList, enumerator);
+    EnumeratorList enumeratorList(enumerator.enumerator);
+    target.enumeratorList = enumeratorList;
 }
 
 
