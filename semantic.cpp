@@ -83,13 +83,15 @@ void semantic::cast(Types &target, Types &a, Types &b, string sign, int lineno) 
 }
 
 void semantic::enumdecl( Types &target, string name, EnumeratorList enumValues, int lineno){
-    target.Enum.type( EnumType( name )),
-    target.Enum.values = enumValues;
+    //target.Exp.type( EnumType( name )),
+    //target.Exp.values = enumValues;
 }
 
 void semantic::enumeratorlist( Types &target, Enumerator name, int lineno ){
 
 }
 
-void semantic::enumerator( Type &target, )
+
+
+
 

@@ -7,10 +7,13 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <iostream>
+#include <utility>
 
 using std::string;
 using std::vector;
+using std::unordered_map;
 
 enum types {
     INT, BYTE, BOOL, VOID, STRING, ENUM
@@ -40,41 +43,6 @@ struct BasicDeclInfo {
     int lineNum;
 };
 
-typedef union {
-    string str;
-    int integer;
-    bool boolean;
-} Value;
-
-
-struct Enums {
-    vector<EnumDecl> enumerators;
-
-    void addEnumarator(EnumDecl enumerator) {
-        enumerators.push_back(enumerator);
-    }
-};
-
-struct Expression : BasicDeclInfo {
-
-    Value val;
-    types type;
-
-    bool isBool() { return type == BOOL; }
-
-    bool isInt() { return type == INT; }
-
-    bool inNumber() { return (type == INT || type == BYTE); }
-
-    bool isByte() { return type == BYTE; }
-
-    bool isString() { return type == STRING; }
-
-    bool isEnum() { return type == ENUM; }
-
-    // casting?
-};
-
 struct RetType {
     types type;
 };
@@ -89,16 +57,22 @@ struct Program {
 };
 
 struct EnumType {
-    string enumType;
+
+    string enumName;
 
     // the type of enum ID is set to be enumID
     explicit EnumType(const string id) {
-        enumType = "enum" + id;
+        enumName = "enum" + id;
     }
 };
 struct Enumerator {
     int index;
     string value;
+    string enumName;
+
+    void setType( string type ){
+        enumName = type;
+    }
 };
 
 struct EnumeratorList {
@@ -111,6 +85,51 @@ struct EnumDecl : BasicDeclInfo {
     EnumeratorList values;
 };
 
+struct Enums {
+    unordered_map<string, EnumDecl> enumerators;
+
+    void addEnumarator(EnumDecl enumerator) {
+        enumerators[enumerator.namedType.enumName] = enumerator;
+    }
+};
+
+typedef union {
+    string str;
+    int integer;
+    bool boolean;
+    Enumerator enumerator;
+} Value;
+
+class Expression : public BasicDeclInfo {
+
+    Value val;
+    types type;
+
+public:
+    bool isBool() { return type == BOOL; }
+
+    bool isInt() { return type == INT; }
+
+    bool inNumber() { return (type == INT || type == BYTE); }
+
+    bool isByte() { return type == BYTE; }
+
+    bool isString() { return type == STRING; }
+
+    bool isEnum() { return type == ENUM; }
+
+    Value getVal( ){
+
+        if( isEnum() ){
+
+            // the value
+            val.enumerator;
+
+            // the type
+            Enums.
+        }
+    }
+};
 
 
 struct NamedType {
@@ -129,7 +148,6 @@ struct Call : BasicDeclInfo {
     types type;
     ExpList params;
 };
-
 
 struct Formals : BasicDeclInfo {
     // TODO: what about enums
