@@ -12,7 +12,9 @@
 using std::string;
 using std::vector;
 
-enum types {INT, BYTE, BOOL, VOID, STRING, ENUM};
+enum types {
+    INT, BYTE, BOOL, VOID, STRING, ENUM
+};
 
 struct Program;
 class Enums;
@@ -31,44 +33,52 @@ struct Call;
 struct ExpList;
 struct EnumType;
 struct Expression;
-
 struct EnumType;
 
 
-struct BasicDeclInfo{
+struct BasicDeclInfo {
     int lineNum;
 };
 
-typedef union{
+typedef union {
     string str;
     int integer;
     bool boolean;
-}Value;
+} Value;
 
 
 class Enums {
     string name;
     std::vector<string> enumarators;
 public:
-    Enums(string str) {
+    explicit Enums(string str) {
         name = "enum" + str;
     }
+
     string getName() {
         return name;
     }
+
     void addEnumarator(string enumarator) {
         enumarators.push_back(enumarator);
     }
 };
 
-struct Expression : BasicDeclInfo{
+struct Expression : BasicDeclInfo {
 
     Value val;
     types type;
+
     bool isBool() { return type == BOOL; }
+
     bool isInt() { return type == INT; }
+
+    bool inNumber() { return (type == INT || type == BYTE); }
+
     bool isByte() { return type == BYTE; }
+
     bool isString() { return type == STRING; }
+
     bool isEnum() { return type == ENUM; }
 
     // casting?
@@ -78,37 +88,37 @@ struct RetType {
     types type;
 };
 
-struct Funcs{
+struct Funcs {
     vector<FuncDecl> funcDeclarations;
 };
 
-struct Program{
+struct Program {
     Enums enumns;
     Funcs funcs;
 };
 
-struct EnumType{
+struct EnumType {
     string enumType;
+
     // the type of enum ID is set to be enumID
-    EnumType(const string id){
-        enumType = "enum"+id;
+    explicit EnumType(const string id) {
+        enumType = "enum" + id;
     }
 };
 
-struct EnumDecl: BasicDeclInfo{
+struct EnumDecl : BasicDeclInfo {
     EnumType namedType;
     vector<Enumerator> values;
 };
 
-struct Enumerator{
+struct Enumerator {
     int num;
     string value;
 };
 
-struct EnumeratorList{
+struct EnumeratorList {
     vector<Enumerator> values;
 };
-
 
 
 struct NamedType {
@@ -121,7 +131,7 @@ struct ExpList {
     vector<Expression> Params;
 };
 
-struct Call : BasicDeclInfo{
+struct Call : BasicDeclInfo {
     // the returned type ?
     string name;
     types type;
@@ -129,28 +139,28 @@ struct Call : BasicDeclInfo{
 };
 
 
-struct Formals : BasicDeclInfo{
+struct Formals : BasicDeclInfo {
     // TODO: what about enums
     vector<NamedType> params;
 };
 
-struct FormalDecl : BasicDeclInfo{
+struct FormalDecl : BasicDeclInfo {
     types type;
 };
 
-struct FormalsList{
+struct FormalsList {
     vector<FormalDecl> FunDeclParams;
 };
 
-struct Statement{
+struct Statement {
     // TODO
 };
 
-struct Statements{
+struct Statements {
     vector<Statement> statements;
 };
 
-struct FuncDecl : BasicDeclInfo{
+struct FuncDecl : BasicDeclInfo {
     types retType;
     string name;
     Formals formals;

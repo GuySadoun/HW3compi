@@ -17,7 +17,7 @@ enum ErrorType {
 class semErr : public std::exception {
 public:
     semErr(const string msg) : m_msg(msg) {}
-    const char* what() const throw () override {
+    const char* what() const noexcept override {
         cout << "semErr - what:" << m_msg << endl;
         return m_msg.c_str();
     }

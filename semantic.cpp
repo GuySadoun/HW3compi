@@ -6,73 +6,79 @@
 using namespace output;
 
 void semantic::binop(Types &target, Types &a, Types &b, string sign, int lineno) {
-    if ((a.Exp.isInt() && b.Exp.isInt()) || (a.Exp.isByte() && b.Exp.isByte()))  {
+    if (a.Exp.inNumber() && b.Exp.inNumber())  {
         if (sign == "+") {
             target.Exp.val.integer = a.Exp.val.integer + b.Exp.val.integer;
-            target.Exp.type = INT;
         } else if (sign == "-") {
             target.Exp.val.integer = a.Exp.val.integer - b.Exp.val.integer;
-            target.Exp.type = INT;
         } else if (sign == "*") {
             target.Exp.val.integer = a.Exp.val.integer * b.Exp.val.integer;
-            target.Exp.type = INT;
         } else if (sign == "/") {
             target.Exp.val.integer = a.Exp.val.integer / b.Exp.val.integer;
-            target.Exp.type = INT;
         } else {
             string exceptionMessage("binop undefined");
             throw (semErr(exceptionMessage));
         }
-    } else
+        if (a.Exp.isInt() || b.Exp.isInt()) target.Exp.type = INT;
+        else target.Exp.type = BYTE;
+    } else {
         errorSyn(lineno);
+    }
 }
 
 void semantic::relop(Types &target, Types &a, Types &b, string sign, int lineno) {
     if (a.Exp.isInt() && b.Exp.isInt()) {
         if (sign == "<") {
             target.Exp.val.boolean = (a.Exp.val.integer < b.Exp.val.integer);
-            target.Exp.type = BOOL;
         } else if (sign == "<=") {
             target.Exp.val.boolean = (a.Exp.val.integer <= b.Exp.val.integer);
-            target.Exp.type = BOOL;
         } else if (sign == ">") {
             target.Exp.val.boolean = (a.Exp.val.integer > b.Exp.val.integer);
-            target.Exp.type = BOOL;
         } else if (sign == ">=") {
             target.Exp.val.boolean = (a.Exp.val.integer >= b.Exp.val.integer);
-            target.Exp.type = BOOL;
         } else {
             string exceptionMessage("relop undefined");
             throw (semErr(exceptionMessage));
         }
-    } else
+    } else {
         errorSyn(lineno);
+    }
+    target.Exp.type = BOOL;
 }
 
 void semantic::logicop(Types &target, Types &a, Types &b, string sign, int lineno) {
     if (a.Exp.isBool() && b.Exp.isBool()) {
         if (sign == "and") {
             target.Exp.val.boolean = (a.Exp.val.boolean && b.Exp.val.boolean);
-            target.Exp.type = BOOL;
         } else if (sign == "or") {
             target.Exp.val.boolean = (a.Exp.val.boolean || b.Exp.val.boolean);
-            target.Exp.type = BOOL;
         } else if (sign == "not") {
             target.Exp.val.boolean = !a.Exp.val.boolean;
-            target.Exp.type = BOOL;
         } else {
             string exceptionMessage("logicop undefined");
             throw (semErr(exceptionMessage));
         }
-    } else
+    } else {
         errorSyn(lineno);
+    }
+    target.Exp.type = BOOL;
 }
 
 void semantic::call(Types &target, Types &call, int lineno) {
-    target.Exp.type = call.
+    if (call.call.name == "print") {
+        for (auto &str : call.call.params.Params) {
+            
+        }
+    }
+    target.Exp.type = call.call.type;
+    target.Exp.lineNum = call.call.lineNum;
 }
 
 void semantic::bytecheck(Types &target, Types &byte, int lineno) {
+
+}
+
+void semantic::cast(Types &target, Types &a, Types &b, string sign, int lineno) {
 
 }
 
