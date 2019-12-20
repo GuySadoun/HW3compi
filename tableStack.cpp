@@ -58,13 +58,12 @@ void symbolTable::endScope() {
 }
 
 bool symbolTable::exist(string str) {
-
     // go lifo in the vector, look for the symbol
 
     return false;
 }
 
-Types symbolTable::findSymbol(string symbol) {
+Types &symbolTable::findSymbol(string symbol) {
     Types result;
     return result;
 }

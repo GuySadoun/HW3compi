@@ -21,31 +21,31 @@ public:
     const string m_msg;
 };
 
-class symbolTable {
-    class Table {
-        struct TableEntry {
-            string name;
-            types type;
-            int offset;
-            Types val;
-            TableEntry(string name, string type, int offset) : name(name), type(type), offset(offset) {}
-        };
-        vector<TableEntry> scopeTable;
-    public:
-        Table() = default;
-        void newLine(string name, string type, int off);
-        bool existInTable(string name);
-        ~Table();
+class Table {
+    vector<TableEntry> scopeTable;
+public:
+    struct TableEntry {
+        string name;
+        types type;
+        int offset;
+        Types val;
+        TableEntry(string name, string type, int offset) : name(name), type(type), offset(offset) {}
     };
+    Table() = default;
+    void newLine(string name, string type, int off);
+    bool existInTable(string name);
+    ~Table();
+};
+
+class symbolTable {
     vector<Table*> tablesStack;
     OffsetStack offsetStack;
-    unordered_map<string, Types> symbolTableValues;
-
 public:
     symbolTable() = default;
     void newVar(string symbol, string type, Types value);
     void updateSymbolValue( string symbol, Types value );
-    types getType( string symbol);
+    types getType(string symbol);
+
     void newScope();
     void endScope();
     bool exist(string symbol);

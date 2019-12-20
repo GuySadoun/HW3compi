@@ -19,6 +19,16 @@ using std::vector;
 enum types {
     INT, BYTE, BOOL, VOID, STRING, ENUM
 };
+enum unionHelper {
+    Int_type,
+    Bool_type,
+    Types_type;
+    EnumeratorList_type,
+    Enumerator_type,
+    String_type,
+    Call_type,
+    Expression_type
+};
 
 enum statType {
     DECL, FLOW, LOOP, SCOPE, ASSIGN
@@ -91,6 +101,7 @@ struct EnumDecl : BasicDeclInfo {
 struct Expression : BasicDeclInfo {
 
     Value val;
+    string id;
     types type;
 
     bool isBool() { return type == BOOL; }
@@ -165,17 +176,61 @@ struct Program {
     Funcs funcs;
 };
 
-typedef union {
-    int integer;
-    bool boolean;
-    types type;
-    EnumeratorList enumeratorList;
-    Enumerator enumerator;
-    string str;
-    Call call;
-    Expression Exp;
-} Types;
+union Types {
+    struct {
+        unionHelper h;
+        int i;
+    } integer;
+    struct {
+        unionHelper h;
+        bool b;
+    } boolean;
+    struct {
+        unionHelper h;
+        types t;
+    } type;
+    struct {
+        unionHelper h;
+        EnumeratorList el;
+    } enumeratorList;
+    struct {
+        unionHelper h;
+        Enumerator e;
+    } numerator;
+    struct {
+        unionHelper h;
+        string s;
+    } str;
+    struct {
+        unionHelper h;
+        Call c;
+    } call;
+    struct {
+        unionHelper h;
+        Expression exp;
+    } Exp;
+    types (types const& other) {
+        // This is safe.
+        switch (other.integer.h) {
+            case Int_type:   ::new(&i) auto(other.i); break;
+            case Bool_type:  ::new(&f) auto(other.f); break;
+            case EnumeratorList_type: ::new(&s) auto(other.el); break;
+            case Enumerator_type: ::new(&s) auto(other.e); break;
+            case String_type: ::new(&s) auto(other.s); break;
+            case Call_type: ::new(&s) auto(other.c); break;
+            case Expression_type: ::new(&s) auto(other.exp); break;
+        }
+    }
+};
 
+Int_type,
+Bool_type,
+Types_type;
+EnumeratorList_type,
+Enumerator_type,
+String_type,
+Call_type,
+Expression_type
 extern Enums declared;
 extern symbolTable symbolTable;
 

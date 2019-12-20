@@ -160,12 +160,13 @@ EnumType : ENUM ID { printProductionRule(43); }
     ;
 
 Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
-                          $$.Exp.type = $2.Exp.type; }
+                          $$.Exp.type = $2.Exp.type;
+                          $$.Exp.id = $2.Exp.id; }
     | Exp ADDITIVE Exp { semantic::binop($$, $1, $3, $2.str, yylineno); }
     | Exp MUL Exp { semantic::binop($$, $1, $3, $2.str, yylineno);}
-    | ID { $$.Exp.name = $1.str;
+    | ID { $$.Exp.id = $1.str;
            $$.Exp.type = STRING; }
-    | Call { semantic::call(Types &target, Types &call, yylineno); }
+    | Call { semantic::call($$, $1, yylineno); }
     | NUM { $$.Exp.val = yylval.value;
             $$.Exp.type = INT; }
     | NUM B { semantic::bytecheck($$, $1, yylineno); }
