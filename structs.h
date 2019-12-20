@@ -223,14 +223,6 @@ union Types {
     }
 };
 
-Int_type,
-Bool_type,
-Types_type;
-EnumeratorList_type,
-Enumerator_type,
-String_type,
-Call_type,
-Expression_type
 extern Enums declared;
 extern symbolTable symbolTable;
 
