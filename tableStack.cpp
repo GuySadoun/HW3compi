@@ -25,18 +25,37 @@ bool symbolTable::Table::existInTable(string name) {
     return false;
 }
 
-void symbolTable::newVar(string name, string type) {
+Table::TableEntry Table::getEntryfromScope(string name) {
+
+    for (auto &entry : scopeTable) {
+        if (entry.name == name) return entry;
+    }
+   // TODO if entry not found
+}
+
+
+Table::TableEntry symbolTable::getSymbolEntry (string symbol){
+
+
+    for (auto table : tablesStack) {
+        if (table->existInTable(symbol)) {
+            return table->getEntryfromScope(symbol);
+        }
+    }
+}
+
+void symbolTable::newVar( string symbol, string type, Types value ) {
     if (tablesStack.empty()) {
         string exceptionMessage("new var with empty");
         throw (TblErr(exceptionMessage));
     }
     for (auto table : tablesStack) {
-        if (table->existInTable(name)) {
+        if (table->existInTable(symbol)) {
             string exceptionMessage("already exist in scopeTable");
             throw (TblErr(exceptionMessage));
         }
     }
-    tablesStack.front()->newLine(name, type, offsetStack.getTop());
+    tablesStack.front()->newLine(symbol, type, offsetStack.getTop());
     offsetStack.incTop();
 }
 
@@ -57,6 +76,8 @@ void symbolTable::endScope() {
 }
 
 bool symbolTable::exist(string str) {
+    // go lifo in the vector, look for the symbol
+
     return false;
 }
 
@@ -73,6 +94,26 @@ Table::TableEntry *symbolTable::getEntry(string symbol) {
 }
 
 Types symbolTable::findSymbol(string symbol) {
+
+    //getSymbolEntry
     Types result;
     return result;
 }
+
+types getType( string symbol){
+    return BOOL;
+}
+
+void updateSymbolValue( string symbol, Types value ){
+
+}
+
+bool exist(string symbol){
+
+}
+
+TableEntry getSymbolEntry( string name ){
+    for (auto table : tablesStack) {
+    }
+}
+
