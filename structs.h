@@ -71,33 +71,12 @@ struct EnumType {
     }
 };
 
-union Value {
-    struct {
-        unionHelper h;
-        string s;
-    } str;
-    struct {
-        unionHelper h;
-        int i;
-    } integer;
-    struct {
-        unionHelper h;
-        bool b;
-    } boolean;
-    struct {
-        unionHelper h;
-        EnumType e;
-    } enumType;
-    Value (Value const& other) {
-        // This is safe.
-        switch (other.integer.h) {
-            case Int_type:   ::new(&integer) auto(other.i); break;
-            case Bool_type:  ::new(&boolean) auto(other.f); break;
-            case EnumeratorList_type: ::new(&str) auto(other.el); break;
-            case Enumerator_type: ::new(&enumType) auto(other.e); break;
-        }
-    }
-};
+typedef union {
+    string str;
+    int integer;
+    bool boolean;
+    EnumType enumType;
+} Value;
 
 struct Enumerator {
     string value;
@@ -197,52 +176,16 @@ struct Program {
     Funcs funcs;
 };
 
-union Types {
-    struct {
-        unionHelper h;
-        int i;
-    } integer;
-    struct {
-        unionHelper h;
-        bool b;
-    } boolean;
-    struct {
-        unionHelper h;
-        types t;
-    } type;
-    struct {
-        unionHelper h;
-        EnumeratorList el;
-    } enumeratorList;
-    struct {
-        unionHelper h;
-        Enumerator e;
-    } enumerator;
-    struct {
-        unionHelper h;
-        string s;
-    } str;
-    struct {
-        unionHelper h;
-        Call c;
-    } call;
-    struct {
-        unionHelper h;
-        Expression exp;
-    } Exp;
-    types (types const& other) {
-        // This is safe.
-        switch (other.integer.h) {
-            case Int_type:   ::new(&integer) auto(other.i); break;
-            case Bool_type:  ::new(&boolean) auto(other.b); break;
-            case EnumeratorList_type: ::new(&enumeratorList) auto(other.el); break;
-            case Enumerator_type: ::new(&enumerator) auto(other.e); break;
-            case String_type: ::new(&str) auto(other.s); break;
-            case Call_type: ::new(&call) auto(other.c); break;
-            case Expression_type: ::new(&Exp) auto(other.exp); break;
-        }
-    }
-};
+typedef union {
+    int integer;
+    bool boolean;
+    types type;
+    EnumeratorList enumeratorList;
+    Enumerator enumerator;
+    string str;
+    Call call;
+    Expression Exp;
+} Types;
 
 extern Enums declared;
 extern symbolTable symbolTable;
