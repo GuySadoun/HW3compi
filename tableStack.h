@@ -4,7 +4,7 @@
 
 #ifndef HW3COMPI_TABLESTACK_H
 #define HW3COMPI_TABLESTACK_H
-
+#include "hw3_output.hpp"
 #include "offsetStack.h"
 #include "structs.h"
 #include <vector>
@@ -49,13 +49,13 @@ public:
     void newScope();
     void endScope();
 
-    void newVar(const string& name, types type, Types & value);
+    void newVar(const string& name, types type, Types & value, int lineNum);
     void updateSymbolValue(const string& name, Types value);
 
-    string getStringVal(const string& symbol);
-    int getIntegerVal(const string& symbol);
-    bool getBoolVal(const string& symbol);
-    FuncDecl getFuncVal(const string& symbol);
+    string getStringVal(const string& symbol, int lineNum);
+    int getIntegerVal(const string& symbol, int lineNum);
+    bool getBoolVal(const string& symbol, int lineNum);
+    FuncDecl getFuncVal(const string& symbol, int lineNum);
 
     bool exist(const string& symbol);
 

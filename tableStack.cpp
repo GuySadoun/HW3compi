@@ -3,15 +3,9 @@
 //
 
 #include "tableStack.h"
-
 #include <utility>
 
 void Table::newLine(string name, types type, int off, Types &value) {
-
-    if (scopeTable.empty()) {
-        string exceptionMessage("new line to empty scopeTable");
-        throw (TblErr(exceptionMessage));
-    }
 
     scopeTable.insert( scopeTable.begin(),
             new TableEntry(std::move(name), type, off, value));
@@ -52,12 +46,43 @@ void symbolTable::endScope() {
     offsetStack.endScope();
 }
 
-void symbolTable::newVar(const string& symbol, types type, Types &value) {
+string symbolTable::typeToStr(types type){
+
+    string typeStr;
+    switch(type) {
+        case INT:
+            typeStr = "int";
+            break;
+        case BYTE:
+            typeStr = "int";
+            break;
+        case BOOL:
+            typeStr = "bool";
+            break;
+        case STRING:
+            typeStr = "string";
+            break;
+        case ENUM:
+            //TODO how to save enum custom type
+            typeStr = "enum";
+            break;
+        case FUNC:
+            //TODO where to get the params for makeFunctionType
+            //output::makeFunctionType( );
+            break;
+        case VOID:
+            break;
+    }
+
+    return typeStr;
+}
+
+void symbolTable::newVar(const string& symbol, types type, Types &value, int lineNum) {
+
 
     for (auto table : tablesStack) {
         if (table->existInTable(symbol)) {
-            string exceptionMessage("already exist in scopeTable");
-            throw (TblErr(exceptionMessage));
+            output::errorDef( lineNum, symbol);
         }
     }
     tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value);
@@ -98,58 +123,50 @@ void symbolTable::updateSymbolValue(const string& symbol, Types value) {
     throw (TblErr("errorUndef"));
 }
 
-string symbolTable::getStringVal(const string& symbol) {
+string symbolTable::getStringVal(const string& symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == STRING)) {
                 return entry->val.str;
-            } else {
-                // TODO throw the right exception
-                throw (TblErr("error Undefined"));
             }
         }
     }
+    output::errorUndef( lineNum, symbol );
 }
 
-bool symbolTable::getBoolVal(const string& symbol) {
+bool symbolTable::getBoolVal(const string& symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == BOOL)) {
                 return entry->val.boolean;
-            } else {
-                // TODO throw the right exception
-                throw (TblErr("error Undefined"));
             }
         }
     }
+    output::errorUndef( lineNum, symbol );
 }
 
-int symbolTable::getIntegerVal(const string& symbol) {
+int symbolTable::getIntegerVal(const string& symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == INT)) {
                 return entry->val.integer;
-            } else {
-                // TODO throw the right exception
-                throw (TblErr("error Undefined"));
             }
         }
     }
+    output::errorUndef( lineNum, symbol );
 }
 
-FuncDecl symbolTable::getFuncVal(const string& symbol) {
+FuncDecl symbolTable::getFuncVal(const string& symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == FUNC)) {
                 // TODO: add FuncDecl to union types
                 return FuncDecl();
                 //return entry->val.func;
-            } else {
-                // TODO throw the right exception
-                throw (TblErr("error Undefined"));
             }
         }
     }
+    output::errorUndefFunc( lineNum, symbol );
 }
 
 bool symbolTable::exist(const string& symbol) {
