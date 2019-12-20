@@ -4,6 +4,8 @@
 
 #include "tableStack.h"
 
+#include <utility>
+
 void Table::newLine(string name, types type, int off, Types &value) {
 
     if (scopeTable.empty()) {
@@ -11,9 +13,8 @@ void Table::newLine(string name, types type, int off, Types &value) {
         throw (TblErr(exceptionMessage));
     }
 
-    // TODO no matching member function for call to push_back
     scopeTable.insert( scopeTable.begin(),
-            new TableEntry(name, type, off, value));
+            new TableEntry(std::move(name), type, off, value));
 }
 
 Table::~Table() {
@@ -87,6 +88,8 @@ void symbolTable::updateSymbolValue(string symbol, Types value) {
                             break;
                         case FUNC:
                             break;
+                        case VOID:
+                            break;
                     }
                 }
             }
@@ -95,7 +98,7 @@ void symbolTable::updateSymbolValue(string symbol, Types value) {
     throw (TblErr("errorUndef"));
 }
 
-string symbolTable::getStringVal(string symbol) {
+string symbolTable::getStringVal(const string& symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == STRING)) {
@@ -108,7 +111,7 @@ string symbolTable::getStringVal(string symbol) {
     }
 }
 
-bool symbolTable::getBoolVal(string symbol) {
+bool symbolTable::getBoolVal(const string& symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == BOOL)) {
@@ -134,7 +137,7 @@ int symbolTable::getIntegerVal(string symbol) {
     }
 }
 
-FuncDecl symbolTable::getFuncVal(string symbol) {
+FuncDecl symbolTable::getFuncVal(const string& symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == FUNC)) {
@@ -149,7 +152,7 @@ FuncDecl symbolTable::getFuncVal(string symbol) {
     }
 }
 
-bool symbolTable::exist(string symbol) {
+bool symbolTable::exist(const string& symbol) {
 
     // go lifo in the vector, look for the symbol
     bool exists = false;

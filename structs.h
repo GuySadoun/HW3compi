@@ -43,7 +43,6 @@ struct EnumType;
 struct Expression;
 struct EnumType;
 
-
 struct BasicDeclInfo {
     int lineNum;
 };
@@ -66,6 +65,7 @@ typedef union {
     int integer;
     bool boolean;
     EnumType enumType;
+    Call funType;
 } Value;
 
 struct Enumerator {
@@ -75,9 +75,11 @@ struct Enumerator {
 
 struct EnumeratorList {
     unordered_map<string, Enumerator> values;
+
     EnumeratorList(Enumerator e) {
         values[e.enumName] = e;
     }
+
     EnumeratorList(EnumeratorList elist, Enumerator e) : values(std::move(elist.values)) {
         values[e.enumName] = e;
     }
@@ -86,6 +88,7 @@ struct EnumeratorList {
 struct EnumDecl : BasicDeclInfo {
     EnumType namedType;
     EnumeratorList values;
+
     EnumDecl(string name, EnumeratorList vals) {
         namedType = EnumType(name);
         values = vals;
@@ -113,15 +116,19 @@ struct Expression : BasicDeclInfo {
 };
 
 struct ExpList {
-    types type;
-    vector<Expression> Params;
+    vector<Expression> args;
+
+    ExpList(ExpList expList, Expression exp) {
+        args = expList.args;
+        args.push_back(exp);
+    }
 };
 
 struct Call : BasicDeclInfo {
     // the returned type ?
     string name;
     types type;
-    ExpList params;
+    ExpList args;
 };
 
 struct Formals : BasicDeclInfo {
@@ -178,8 +185,9 @@ typedef union {
     Enumerator enumerator;
     string str;
     Call call;
-    Expression Exp;
+    Expression exp;
     EnumDecl enumDecl;
+    EnumType enumType;
 } Types;
 
 extern Enums declared;

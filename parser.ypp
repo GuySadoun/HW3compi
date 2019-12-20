@@ -14,6 +14,7 @@
 	int yyerror(const char * message);
 	#define YYSTYPE Types
 %}
+
 %union Types{
      int Integer;
      bool Boolean;
@@ -24,49 +25,49 @@
      Expression Exp;
      NamedExpression NamedExp;
 };
-%type <Exp> Exp
-%type <Type> Type
-%type <Funcs> Funcs
-%type <FuncDecl> FuncDecl
-%type <Enums> Enums
-%type <EnumDecl> EnumDecl
-%type <RetType> RetType
-%type <Formals> Formals
-%type <FormalsList> FormalsList
-%type <FormalDecl> FormalDecl
-%type <EnumeratorList> EnumeratorList
-%type <Enumerator> Enumerator
-%type <Statements> Statements
-%type <Statement> Statement
-%type <Call> Call
-%type <ExpList> ExpList
-%type <Type> Type
-%type <EnumType> EnumType
-%type <Exp> Exp
 
-%token <Str> BOOL VOID
-%token <EnumClass> ENUM
-%token <Integer> INT BYTE B
-%token <Str> TRUE FALSE
-%token <Str> WHILE RETURN
-%token <Str> BREAK CONTINUE
-%token <Str> SC COMMA
-%token <Str> STRING ID
-%token <Integer> NUM
+%type <exp> Exp
+%type <type> Type
+%type <funcs> Funcs
+%type <funcDecl> FuncDecl
+%type <enums> Enums
+%type <enumDecl> EnumDecl
+%type <retType> RetType
+%type <formals> Formals
+%type <formalsList> FormalsList
+%type <formalDecl> FormalDecl
+%type <enumeratorList> EnumeratorList
+%type <enumerator> Enumerator
+%type <statements> Statements
+%type <statement> Statement
+%type <call> Call
+%type <expList> ExpList
+%type <type> Type
+%type <enumType> EnumType
 
-%right <Str> ASSIGN
+%token <str> BOOL VOID
+%token <enumClass> ENUM
+%token <integer> INT BYTE B
+%token <str> TRUE FALSE
+%token <str> WHILE RETURN
+%token <str> BREAK CONTINUE
+%token <str> SC COMMA
+%token <str> STRING ID
+%token <integer> NUM
+
+%right <str> ASSIGN
 %nonassoc NO_ELSE
-%nonassoc <Str> ELSE
-%right <Str> IF
-%left <Str> OR
-%left <Str> AND
-%left <Str> EQUALITY
-%nonassoc <Str> LHSS
-%nonassoc <Str> RHSS
-%left <Str> ADDITIVE
-%left <Str> MUL
-%right <Str> NOT
-%left <Str> LPAREN RPAREN LBRACE RBRACE
+%nonassoc <str> ELSE
+%right <str> IF
+%left <str> OR
+%left <str> AND
+%left <str> EQUALITY
+%nonassoc <str> LHSS
+%nonassoc <str> RHSS
+%left <str> ADDITIVE
+%left <str> MUL
+%right <str> NOT
+%left <str> LPAREN RPAREN LBRACE RBRACE
 
 %%
 
@@ -156,7 +157,7 @@ Type : INT { currRetType = "int"; }
     | BOOL { currRetType = "bool"; }
     ;
 
-EnumType : ENUM ID { printProductionRule(43); }
+EnumType : ENUM ID { semantic::enumType($$, $2, yylineno); }
     ;
 
 Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
@@ -188,7 +189,6 @@ Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
 
 int main()
 {
-
 	yyparse();
 }
 
@@ -196,5 +196,5 @@ int yyerror(const char * message)
 {
     if (yylval == 1) errorLex(yylineno);
 	else errorSyn(yylineno);
-	exit(0);
+	exit(1);
 }

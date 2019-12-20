@@ -50,12 +50,12 @@ public:
     void newVar(string name, types type, Types & value);
     void updateSymbolValue(string name, Types value);
 
-    string getStringVal(string symbol);
+    string getStringVal(const string& symbol);
     int getIntegerVal(string symbol);
-    bool getBoolVal(string symbol);
-    FuncDecl getFuncVal(string symbol);
+    bool getBoolVal(const string& symbol);
+    FuncDecl getFuncVal(const string& symbol);
 
-    bool exist(string symbol);
+    bool exist(const string& symbol);
 
 
 };
