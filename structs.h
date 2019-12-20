@@ -6,9 +6,12 @@
 #define HW3COMPI_STRUCTS_H
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <unordered_map>
 #include <iostream>
+#include "tableStack.h"
+
 using std::unordered_map;
 using std::string;
 using std::vector;
@@ -17,8 +20,12 @@ enum types {
     INT, BYTE, BOOL, VOID, STRING, ENUM
 };
 
+enum statType {
+    DECL, FLOW, LOOP, SCOPE, ASSIGN
+};
+
 struct Program;
-class Enums;
+struct Enums;
 struct Funcs;
 struct FuncDecl;
 struct EnumDecl;
@@ -39,49 +46,46 @@ struct EnumType;
 
 struct BasicDeclInfo {
     int lineNum;
-    explicit BasicDeclInfo(int lineNum) : lineNum(lineNum) {}
 };
-
-typedef union {
-    string str;
-    int integer;
-    bool boolean;
-} Value;
 
 struct Funcs {
     vector<FuncDecl> funcDeclarations;
 };
 
 struct EnumType {
-    string enumName;
+    string name;
 
     // the type of enum ID is set to be enumID
     explicit EnumType(const string id) {
-        enumName = "enum" + id;
+        name = "enum" + id;
     }
-
-    EnumType() {}
 };
+
+typedef union {
+    string str;
+    int integer;
+    bool boolean;
+    EnumType enumType;
+} Value;
+
 struct Enumerator {
-    int index;
     string value;
     string enumName;
-
-    void setType( string type ){
-        enumName = type;
-    }
 };
 
 struct EnumeratorList {
-    vector<Enumerator> values;
+    unordered_map<string, Enumerator> values;
+    EnumeratorList(EnumeratorList elist, Enumerator e) : values(std::move(elist.values)) {
+        values[e.enumName] = e;
+    }
+    EnumeratorList(Enumerator e) {
+        values[e.enumName] = e;
+    }
 };
 
 struct EnumDecl : BasicDeclInfo {
     EnumType namedType;
     EnumeratorList values;
-    EnumDecl(string enumName, EnumeratorList el, int lineNum) : BasicDeclInfo(lineNum) {
-
-    }
 };
 
 struct Expression : BasicDeclInfo {
@@ -101,18 +105,6 @@ struct Expression : BasicDeclInfo {
 
     bool isEnum() { return type == ENUM; }
 
-    Value getVal(){
-
-        if( isEnum() ){
-
-        }
-        return val;
-    }
-};
-
-struct NamedType {
-    types type;
-    string id;
 };
 
 struct ExpList {
@@ -129,7 +121,6 @@ struct Call : BasicDeclInfo {
 
 struct Formals : BasicDeclInfo {
     // TODO: what about enums
-    vector<NamedType> params;
 };
 
 struct FormalDecl : BasicDeclInfo {
@@ -141,7 +132,7 @@ struct FormalsList {
 };
 
 struct Statement {
-    // TODO
+    statType statType;
 };
 
 struct Statements {
@@ -160,15 +151,17 @@ struct FuncDecl : BasicDeclInfo {
 };
 
 struct Enums {
-    unordered_map<string, EnumDecl> enumerators;
+    unordered_map<EnumType, EnumDecl> declaredEnums;
+
     Enums() = default;
-    void addEnumarator(EnumDecl enumerator) {
-        enumerators[enumerator.namedType.enumName] = enumerator;
+
+    void addEnumerator(EnumDecl enumerator) {
+        declaredEnums[enumerator.namedType] = enumerator;
     }
 };
 
 struct Program {
-    Enums enumns;
+    Enums enums;
     Funcs funcs;
 };
 
@@ -176,10 +169,15 @@ typedef union {
     int integer;
     bool boolean;
     types type;
+    EnumeratorList enumeratorList;
+    Enumerator enumerator;
     string str;
     Call call;
     Expression Exp;
 } Types;
+
+extern Enums declared;
+extern symbolTable symbolTable;
 
 #define YYSTYPE Types
 

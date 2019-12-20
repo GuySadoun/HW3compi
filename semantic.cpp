@@ -95,8 +95,9 @@ void semantic::bytecheck(Types &target, Types &byte, int lineno) {
 
 void semantic::cast(Types &target, Types &to, Types &exp, string sign, int lineno) {
     if (exp.Exp.type != ENUM || to.type != INT) errorMismatch(lineno);
+    if (symbolTable.)
     exp.Exp.type = INT;
-    exp.Exp.val = exp.Exp.
+    declared.declaredEnums.at([.Exp.val.enumType.name]);
 }
 
 void semantic::enumdecl( Types &target, string name, EnumeratorList enumValues, int lineno){
@@ -104,8 +105,12 @@ void semantic::enumdecl( Types &target, string name, EnumeratorList enumValues, 
     //target.Exp.values = enumValues;
 }
 
-void semantic::enumeratorlist( Types &target, Enumerator name, int lineno ){
+void semantic::enumeratorlist1(Types &target, Types& enumerator, int lineno) {
+    target.enumeratorList(enumerator);
+}
 
+void semantic::enumeratorlist2(Types &target, Types &enumeratorList, Types& enumerator, int lineno) {
+    target.enumeratorList(enumeratorList, enumerator);
 }
 
 

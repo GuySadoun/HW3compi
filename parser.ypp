@@ -10,7 +10,7 @@
 	extern int yylex();
 	extern char* yytext;
 	extern int yylineno;
-	TableStack *symbolTable;
+	symbolTable *symbolTable;
 	int yyerror(const char * message);
 	#define YYSTYPE Types
 %}
@@ -81,7 +81,7 @@ FuncDecl : RetType ID InsertDecl LPAREN Formals RPAREN  LBRACE NewScope Statemen
     ;
 
 InsertDecl : %empty {
-                        if (!symbolTable) symbolTable = new TableStack;
+                        if (!symbolTable) symbolTable = new symbolTable;
                         symbolTable->newVar((string)yytext,
                     }
 
@@ -110,8 +110,8 @@ FormalDecl : Type ID InsertDecl { printProductionRule(14); }
     | EnumType ID { printProductionRule(15); }
     ;
 
-EnumeratorList : Enumerator { semantic::enumeratorlist($$, $1, yylineno); }
-    | EnumeratorList COMMA Enumerator { printProductionRule(17); }
+EnumeratorList : Enumerator { semantic::enumeratorlist1($$, $1, yylineno); }
+    | EnumeratorList COMMA Enumerator { semantic::enumeratorlist2($$, $1, $3, yylineno); }
     ;
 
 Enumerator : ID { printProductionRule(18); }
@@ -139,7 +139,7 @@ Statement : LBRACE NewScope Statements RBRACE { printProductionRule(21); }
     ;
 
 NewScope : %empty {
-                        if (!symbolTable) symbolTable = new TableStack;
+                        if (!symbolTable) symbolTable = new symbolTable;
                         symbolTable->newScope();
                    }
 

@@ -6,6 +6,7 @@
 #define HW3COMPI_TABLESTACK_H
 
 #include "offsetStack.h"
+#include "structs.h"
 #include <vector>
 
 using std::vector;
@@ -20,13 +21,13 @@ public:
     const string m_msg;
 };
 
-class TableStack {
+class symbolTable {
     class Table {
         struct TableEntry {
             string name;
             string type;
             int offset;
-
+            Types val;
             TableEntry(string name, string type, int offset) : name(name), type(type), offset(offset) {}
         };
         vector<TableEntry> scopeTable;
@@ -39,10 +40,12 @@ class TableStack {
     vector<Table*> tablesStack;
     OffsetStack offsetStack;
 public:
-    TableStack() = default;
+    symbolTable() = default;
     void newVar(string name, string type);
     void newScope();
     void endScope();
+    bool exist(string symbol);
+    Types findSymbol(string symbol);
 };
 
 #endif //HW3COMPI_TABLESTACK_H

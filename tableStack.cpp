@@ -4,7 +4,7 @@
 
 #include "tableStack.h"
 
-void TableStack::Table::newLine(string name, string type, int off) {
+void symbolTable::Table::newLine(string name, string type, int off) {
     if (scopeTable.empty()) {
         string exceptionMessage("new line to empty scopeTable");
         throw (TblErr(exceptionMessage));
@@ -12,20 +12,20 @@ void TableStack::Table::newLine(string name, string type, int off) {
     scopeTable.push_back(*(new TableEntry(name, type, off)));
 }
 
-TableStack::Table::~Table() {
+symbolTable::Table::~Table() {
     for (auto entry : scopeTable) {
         delete &entry;
     }
 }
 
-bool TableStack::Table::existInTable(string name) {
+bool symbolTable::Table::existInTable(string name) {
     for (auto &entry : scopeTable) {
         if (entry.name == name) return true;
     }
     return false;
 }
 
-void TableStack::newVar(string name, string type) {
+void symbolTable::newVar(string name, string type) {
     if (tablesStack.empty()) {
         string exceptionMessage("new var with empty");
         throw (TblErr(exceptionMessage));
@@ -40,13 +40,13 @@ void TableStack::newVar(string name, string type) {
     offsetStack.incTop();
 }
 
-void TableStack::newScope() {
+void symbolTable::newScope() {
     auto it = tablesStack.begin();
     offsetStack.newScope();
     tablesStack.insert(it, new Table);
 }
 
-void TableStack::endScope() {
+void symbolTable::endScope() {
     if (tablesStack.empty()) {
         string exceptionMessage("end scope with empty stack");
         throw (TblErr(exceptionMessage));
@@ -54,4 +54,13 @@ void TableStack::endScope() {
     delete *(tablesStack.begin());
     tablesStack.erase(tablesStack.begin());
     offsetStack.endScope();
+}
+
+bool symbolTable::exist(string str) {
+    return false;
+}
+
+Types symbolTable::findSymbol(string symbol) {
+    Types result;
+    return result;
 }
