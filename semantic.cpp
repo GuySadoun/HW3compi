@@ -23,13 +23,13 @@ void printi(int n) {
 void semantic::binop(Types &target, Types &a, Types &b, string sign, int lineno) {
     if (a.Exp.exp.isNumber() && b.Exp.exp.isNumber())  {
         if (sign == "+") {
-            target.Exp.exp.val.integer = a.Exp.exp.val.integer + b.Exp.exp.val.integer;
+            target.Exp.exp.val.integer.i = a.Exp.exp.val.integer.i + b.Exp.exp.val.integer.i;
         } else if (sign == "-") {
-            target.Exp.exp.val.integer = a.Exp.exp.val.integer - b.Exp.exp.val.integer;
+            target.Exp.exp.val.integer.i = a.Exp.exp.val.integer.i - b.Exp.exp.val.integer.i;
         } else if (sign == "*") {
-            target.Exp.exp.val.integer = a.Exp.exp.val.integer * b.Exp.exp.val.integer;
+            target.Exp.exp.val.integer.i = a.Exp.exp.val.integer.i * b.Exp.exp.val.integer.i;
         } else if (sign == "/") {
-            target.Exp.exp.val.integer = a.Exp.exp.val.integer / b.Exp.exp.val.integer;
+            target.Exp.exp.val.integer.i = a.Exp.exp.val.integer.i / b.Exp.exp.val.integer.i;
         } else {
             string exceptionMessage("binop undefined");
             throw (semErr(exceptionMessage));
@@ -44,13 +44,13 @@ void semantic::binop(Types &target, Types &a, Types &b, string sign, int lineno)
 void semantic::relop(Types &target, Types &a, Types &b, string sign, int lineno) {
     if (a.Exp.exp.isNumber() && b.Exp.exp.isNumber()) {
         if (sign == "<") {
-            target.Exp.exp.val.boolean = (a.Exp.exp.val.integer < b.Exp.exp.val.integer);
+            target.Exp.exp.val.boolean.b = (a.Exp.exp.val.integer.i < b.Exp.exp.val.integer.i);
         } else if (sign == "<=") {
-            target.Exp.exp.val.boolean = (a.Exp.exp.val.integer <= b.Exp.exp.val.integer);
+            target.Exp.exp.val.boolean.b = (a.Exp.exp.val.integer.i <= b.Exp.exp.val.integer.i);
         } else if (sign == ">") {
-            target.Exp.exp.val.boolean = (a.Exp.exp.val.integer > b.Exp.exp.val.integer);
+            target.Exp.exp.val.boolean.b = (a.Exp.exp.val.integer.i > b.Exp.exp.val.integer.i);
         } else if (sign == ">=") {
-            target.Exp.exp.val.boolean = (a.Exp.exp.val.integer >= b.Exp.exp.val.integer);
+            target.Exp.exp.val.boolean.b = (a.Exp.exp.val.integer.i >= b.Exp.exp.val.integer.i);
         } else {
             string exceptionMessage("relop undefined");
             throw (semErr(exceptionMessage));
@@ -64,11 +64,11 @@ void semantic::relop(Types &target, Types &a, Types &b, string sign, int lineno)
 void semantic::logicop(Types &target, Types &a, Types &b, string sign, int lineno) {
     if (a.Exp.exp.isBool() && b.Exp.exp.isBool()) {
         if (sign == "and") {
-            target.Exp.exp.val.boolean = (a.Exp.exp.val.boolean && b.Exp.exp.val.boolean);
+            target.Exp.exp.val.boolean.b = (a.Exp.exp.val.boolean.b && b.Exp.exp.val.boolean.b);
         } else if (sign == "or") {
-            target.Exp.exp.val.boolean = (a.Exp.exp.val.boolean || b.Exp.exp.val.boolean);
+            target.Exp.exp.val.boolean.b = (a.Exp.exp.val.boolean.b || b.Exp.exp.val.boolean.b);
         } else if (sign == "not") {
-            target.Exp.exp.val.boolean = !a.Exp.exp.val.boolean;
+            target.Exp.exp.val.boolean.b = !a.Exp.exp.val.boolean.b;
         } else {
             string exceptionMessage("logicop undefined");
             throw (semErr(exceptionMessage));
@@ -91,7 +91,7 @@ void semantic::call(Types &target, Types &call, int lineno) {
 
 void semantic::bytecheck(Types &target, Types &byte, int lineno) {
     if (byte.integer.i > 255) errorByteTooLarge(lineno, std::to_string(byte.integer.i));
-    target.Exp.exp.val.integer = byte.integer.i;
+    target.Exp.exp.val.integer.i = byte.integer.i;
     target.Exp.exp.type = BYTE;
 }
 
