@@ -21,35 +21,48 @@ public:
     const string m_msg;
 };
 
-class symbolTable {
-    class Table {
-        struct TableEntry {
-            string name;
-            types type;
-            int offset;
-            Types val;
-            TableEntry(string name, string type, int offset) : name(name), type(type), offset(offset) {}
-        };
-        vector<TableEntry> scopeTable;
-    public:
-        Table() = default;
-        void newLine(string name, string type, int off);
-        bool existInTable(string name);
-        ~Table();
+class Table {
+    vector<TableEntry> scopeTable;
+public:
+
+    struct TableEntry {
+        string name;
+        types type;
+        int offset;
+        Types val;
+        TableEntry(string name, string type, int offset, Types value) : name(name), type(type), offset(offset) {}
+        TableEntry( TableEntry toCopy){
+             name = toCopy.name;
+             type = toCopy.type;
+             offset = toCopy.offset;
+             val = toCopy.val;
+        }
+        ~TableEntry();
     };
+
+
+    Table() = default;
+    void newLine(string name, string type, int off);
+    bool existInTable(string name);
+    Table::TableEntry getEntryfromScope(string name);
+    ~Table();
+};
+
+class symbolTable {
+
     vector<Table*> tablesStack;
     OffsetStack offsetStack;
-    unordered_map<string, Types> symbolTableValues;
 
 public:
     symbolTable() = default;
     void newVar(string symbol, string type, Types value);
-    void updateSymbolValue( string symbol, Types value );
-    types getType( string symbol);
+    Table::TableEntry getSymbolEntry (string symbol);
     void newScope();
     void endScope();
     bool exist(string symbol);
     Types &findSymbol(string symbol);
+    void updateSymbolValue( string symbol, Types value );
+    types getType( string symbol);
 };
 
 #endif //HW3COMPI_TABLESTACK_H

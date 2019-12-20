@@ -4,7 +4,7 @@
 
 #include "tableStack.h"
 
-void symbolTable::Table::newLine(string name, string type, int off) {
+void Table::newLine(string name, string type, int off) {
     if (scopeTable.empty()) {
         string exceptionMessage("new line to empty scopeTable");
         throw (TblErr(exceptionMessage));
@@ -12,17 +12,36 @@ void symbolTable::Table::newLine(string name, string type, int off) {
     scopeTable.push_back(*(new TableEntry(name, type, off)));
 }
 
-symbolTable::Table::~Table() {
+Table::~Table() {
     for (auto entry : scopeTable) {
         delete &entry;
     }
 }
 
-bool symbolTable::Table::existInTable(string name) {
+bool Table::existInTable(string name) {
     for (auto &entry : scopeTable) {
         if (entry.name == name) return true;
     }
     return false;
+}
+
+Table::TableEntry Table::getEntryfromScope(string name) {
+
+    for (auto &entry : scopeTable) {
+        if (entry.name == name) return entry;
+    }
+   // TODO if entry not found
+}
+
+
+Table::TableEntry symbolTable::getSymbolEntry (string symbol){
+
+
+    for (auto table : tablesStack) {
+        if (table->existInTable(symbol)) {
+            return table->getEntryfromScope(symbol);
+        }
+    }
 }
 
 void symbolTable::newVar( string symbol, string type, Types value ) {
@@ -37,7 +56,6 @@ void symbolTable::newVar( string symbol, string type, Types value ) {
         }
     }
     tablesStack.front()->newLine(symbol, type, offsetStack.getTop());
-    //symbolTableValues[symbol] = value;
     offsetStack.incTop();
 }
 
@@ -65,6 +83,26 @@ bool symbolTable::exist(string str) {
 }
 
 Types symbolTable::findSymbol(string symbol) {
+
+    //getSymbolEntry
     Types result;
     return result;
 }
+
+types getType( string symbol){
+    return BOOL;
+}
+
+void updateSymbolValue( string symbol, Types value ){
+
+}
+
+bool exist(string symbol){
+
+}
+
+TableEntry getSymbolEntry( string name ){
+    for (auto table : tablesStack) {
+    }
+}
+
