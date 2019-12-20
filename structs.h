@@ -71,12 +71,33 @@ struct EnumType {
     }
 };
 
-typedef union {
-    string str;
-    int integer;
-    bool boolean;
-    EnumType enumType;
-} Value;
+union Value {
+    struct {
+        unionHelper h;
+        string s;
+    } str;
+    struct {
+        unionHelper h;
+        int i;
+    } integer;
+    struct {
+        unionHelper h;
+        bool b;
+    } boolean;
+    struct {
+        unionHelper h;
+        EnumType e;
+    } enumType;
+    Value (Value const& other) {
+        // This is safe.
+        switch (other.integer.h) {
+            case Int_type:   ::new(&integer) auto(other.i); break;
+            case Bool_type:  ::new(&boolean) auto(other.f); break;
+            case EnumeratorList_type: ::new(&str) auto(other.el); break;
+            case Enumerator_type: ::new(&enumType) auto(other.e); break;
+        }
+    }
+};
 
 struct Enumerator {
     string value;
@@ -196,7 +217,7 @@ union Types {
     struct {
         unionHelper h;
         Enumerator e;
-    } numerator;
+    } enumerator;
     struct {
         unionHelper h;
         string s;
@@ -212,13 +233,13 @@ union Types {
     types (types const& other) {
         // This is safe.
         switch (other.integer.h) {
-            case Int_type:   ::new(&i) auto(other.i); break;
-            case Bool_type:  ::new(&f) auto(other.f); break;
-            case EnumeratorList_type: ::new(&s) auto(other.el); break;
-            case Enumerator_type: ::new(&s) auto(other.e); break;
-            case String_type: ::new(&s) auto(other.s); break;
-            case Call_type: ::new(&s) auto(other.c); break;
-            case Expression_type: ::new(&s) auto(other.exp); break;
+            case Int_type:   ::new(&integer) auto(other.i); break;
+            case Bool_type:  ::new(&boolean) auto(other.b); break;
+            case EnumeratorList_type: ::new(&enumeratorList) auto(other.el); break;
+            case Enumerator_type: ::new(&enumerator) auto(other.e); break;
+            case String_type: ::new(&str) auto(other.s); break;
+            case Call_type: ::new(&call) auto(other.c); break;
+            case Expression_type: ::new(&Exp) auto(other.exp); break;
         }
     }
 };
