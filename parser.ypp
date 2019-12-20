@@ -181,12 +181,13 @@ Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
     | Exp EQUALITY Exp { semantic::relop($$, $1, $3, $2.str, yylineno); }
     | Exp RHSS Exp { semantic::relop($$, $1, $3, $2.str, yylineno); }
     | Exp LHSS Exp { semantic::relop($$, $1, $3, $2.str, yylineno); }
-    | LPAREN Type RPAREN Exp {  semantic::cast($$, $1, $3, $2.str, yylineno); }
+    | LPAREN Type RPAREN Exp {  semantic::cast($$, $2, $4, yylineno); }
     ;
 %%
 
 int main()
 {
+
 	yyparse();
 }
 

@@ -1,20 +1,33 @@
 //
 // Created by guy-pc on 18/12/2019.
 //
-
+#include <iostream>
+#include <string>
 #include "semantic.h"
 using namespace output;
+using std::cout;
+using std::endl;
+
+//----------------------------builtInFunc--------------------------------//
+void print(string str) {
+    cout << str << endl;
+}
+
+void printi(int n) {
+    cout << n << endl;
+}
+//-----------------------------------------------------------------------//
 
 void semantic::binop(Types &target, Types &a, Types &b, string sign, int lineno) {
-    if (a.Exp.inNumber() && b.Exp.inNumber())  {
+    if (a.Exp.isNumber() && b.Exp.isNumber())  {
         if (sign == "+") {
-            target.Exp.val.integer = a.Exp.val.integer + b.Exp.val.integer;
+            target.Exp.getVal().integer = a.Exp.getVal().integer + b.Exp.getVal().integer;
         } else if (sign == "-") {
-            target.Exp.val.integer = a.Exp.val.integer - b.Exp.val.integer;
+            target.Exp.getVal().integer = a.Exp.getVal().integer - b.Exp.getVal().integer;
         } else if (sign == "*") {
-            target.Exp.val.integer = a.Exp.val.integer * b.Exp.val.integer;
+            target.Exp.getVal().integer = a.Exp.getVal().integer * b.Exp.getVal().integer;
         } else if (sign == "/") {
-            target.Exp.val.integer = a.Exp.val.integer / b.Exp.val.integer;
+            target.Exp.getVal().integer = a.Exp.getVal().integer / b.Exp.getVal().integer;
         } else {
             string exceptionMessage("binop undefined");
             throw (semErr(exceptionMessage));
@@ -27,33 +40,33 @@ void semantic::binop(Types &target, Types &a, Types &b, string sign, int lineno)
 }
 
 void semantic::relop(Types &target, Types &a, Types &b, string sign, int lineno) {
-    if (a.Exp.isInt() && b.Exp.isInt()) {
+    if (a.Exp.isNumber() && b.Exp.isNumber()) {
         if (sign == "<") {
-            target.Exp.val.boolean = (a.Exp.val.integer < b.Exp.val.integer);
+            target.Exp.getVal().boolean = (a.Exp.getVal().integer < b.Exp.getVal().integer);
         } else if (sign == "<=") {
-            target.Exp.val.boolean = (a.Exp.val.integer <= b.Exp.val.integer);
+            target.Exp.getVal().boolean = (a.Exp.getVal().integer <= b.Exp.getVal().integer);
         } else if (sign == ">") {
-            target.Exp.val.boolean = (a.Exp.val.integer > b.Exp.val.integer);
+            target.Exp.getVal().boolean = (a.Exp.getVal().integer > b.Exp.getVal().integer);
         } else if (sign == ">=") {
-            target.Exp.val.boolean = (a.Exp.val.integer >= b.Exp.val.integer);
+            target.Exp.getVal().boolean = (a.Exp.getVal().integer >= b.Exp.getVal().integer);
         } else {
             string exceptionMessage("relop undefined");
             throw (semErr(exceptionMessage));
         }
+        target.Exp.type = BOOL;
     } else {
         errorSyn(lineno);
     }
-    target.Exp.type = BOOL;
 }
 
 void semantic::logicop(Types &target, Types &a, Types &b, string sign, int lineno) {
     if (a.Exp.isBool() && b.Exp.isBool()) {
         if (sign == "and") {
-            target.Exp.val.boolean = (a.Exp.val.boolean && b.Exp.val.boolean);
+            target.Exp.getVal().boolean = (a.Exp.getVal().boolean && b.Exp.getVal().boolean);
         } else if (sign == "or") {
-            target.Exp.val.boolean = (a.Exp.val.boolean || b.Exp.val.boolean);
+            target.Exp.getVal().boolean = (a.Exp.getVal().boolean || b.Exp.getVal().boolean);
         } else if (sign == "not") {
-            target.Exp.val.boolean = !a.Exp.val.boolean;
+            target.Exp.getVal().boolean = !a.Exp.getVal().boolean;
         } else {
             string exceptionMessage("logicop undefined");
             throw (semErr(exceptionMessage));
@@ -75,11 +88,15 @@ void semantic::call(Types &target, Types &call, int lineno) {
 }
 
 void semantic::bytecheck(Types &target, Types &byte, int lineno) {
-
+    if (byte.integer > 255) errorByteTooLarge(lineno, std::to_string(byte.integer));
+    target.Exp.getVal().integer = byte.integer;
+    target.Exp.type = BYTE;
 }
 
-void semantic::cast(Types &target, Types &a, Types &b, string sign, int lineno) {
-
+void semantic::cast(Types &target, Types &to, Types &exp, string sign, int lineno) {
+    if (exp.Exp.type != ENUM || to.type != INT) errorMismatch(lineno);
+    exp.Exp.type = INT;
+    exp.Exp.val = exp.Exp.
 }
 
 void semantic::enumdecl( Types &target, string name, EnumeratorList enumValues, int lineno){

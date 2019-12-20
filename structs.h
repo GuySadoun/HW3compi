@@ -9,11 +9,9 @@
 #include <vector>
 #include <unordered_map>
 #include <iostream>
-#include <utility>
-
+using std::unordered_map;
 using std::string;
 using std::vector;
-using std::unordered_map;
 
 enum types {
     INT, BYTE, BOOL, VOID, STRING, ENUM
@@ -41,29 +39,28 @@ struct EnumType;
 
 struct BasicDeclInfo {
     int lineNum;
+    explicit BasicDeclInfo(int lineNum) : lineNum(lineNum) {}
 };
 
-struct RetType {
-    types type;
-};
+typedef union {
+    string str;
+    int integer;
+    bool boolean;
+} Value;
 
 struct Funcs {
     vector<FuncDecl> funcDeclarations;
 };
 
-struct Program {
-    Enums enumns;
-    Funcs funcs;
-};
-
 struct EnumType {
-
     string enumName;
 
     // the type of enum ID is set to be enumID
     explicit EnumType(const string id) {
         enumName = "enum" + id;
     }
+
+    EnumType() {}
 };
 struct Enumerator {
     int index;
@@ -76,29 +73,16 @@ struct Enumerator {
 };
 
 struct EnumeratorList {
-    int index = 0;
     vector<Enumerator> values;
 };
 
 struct EnumDecl : BasicDeclInfo {
     EnumType namedType;
     EnumeratorList values;
-};
+    EnumDecl(string enumName, EnumeratorList el, int lineNum) : BasicDeclInfo(lineNum) {
 
-struct Enums {
-    unordered_map<string, EnumDecl> enumerators;
-
-    void addEnumarator(EnumDecl enumerator) {
-        enumerators[enumerator.namedType.enumName] = enumerator;
     }
 };
-
-typedef union {
-    string str;
-    int integer;
-    bool boolean;
-    Enumerator enumerator;
-} Value;
 
 class Expression : public BasicDeclInfo {
 
@@ -110,7 +94,7 @@ public:
 
     bool isInt() { return type == INT; }
 
-    bool inNumber() { return (type == INT || type == BYTE); }
+    bool isNumber() { return (type == INT || type == BYTE); }
 
     bool isByte() { return type == BYTE; }
 
@@ -118,19 +102,14 @@ public:
 
     bool isEnum() { return type == ENUM; }
 
-    Value getVal( ){
+    Value getVal(){
 
         if( isEnum() ){
 
-            // the value
-            val.enumerator;
-
-            // the type
-            Enums.
         }
+        return val;
     }
 };
-
 
 struct NamedType {
     types type;
@@ -170,11 +149,28 @@ struct Statements {
     vector<Statement> statements;
 };
 
+struct RetType {
+    types type;
+};
+
 struct FuncDecl : BasicDeclInfo {
     types retType;
     string name;
     Formals formals;
     Statements statements;
+};
+
+struct Enums {
+    unordered_map<string, EnumDecl> enumerators;
+    Enums() = default;
+    void addEnumarator(EnumDecl enumerator) {
+        enumerators[enumerator.namedType.enumName] = enumerator;
+    }
+};
+
+struct Program {
+    Enums enumns;
+    Funcs funcs;
 };
 
 typedef union {
