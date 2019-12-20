@@ -25,6 +25,25 @@ bool symbolTable::Table::existInTable(string name) {
     return false;
 }
 
+Table::TableEntry Table::getEntryfromScope(string name) {
+
+    for (auto &entry : scopeTable) {
+        if (entry.name == name) return entry;
+    }
+   // TODO if entry not found
+}
+
+
+Table::TableEntry symbolTable::getSymbolEntry (string symbol){
+
+
+    for (auto table : tablesStack) {
+        if (table->existInTable(symbol)) {
+            return table->getEntryfromScope(symbol);
+        }
+    }
+}
+
 void symbolTable::newVar( string symbol, string type, Types value ) {
     if (tablesStack.empty()) {
         string exceptionMessage("new var with empty");
@@ -37,7 +56,6 @@ void symbolTable::newVar( string symbol, string type, Types value ) {
         }
     }
     tablesStack.front()->newLine(symbol, type, offsetStack.getTop());
-    //symbolTableValues[symbol] = value;
     offsetStack.incTop();
 }
 
@@ -63,7 +81,27 @@ bool symbolTable::exist(string str) {
     return false;
 }
 
-Types &symbolTable::findSymbol(string symbol) {
+Types symbolTable::findSymbol(string symbol) {
+
+    //getSymbolEntry
     Types result;
     return result;
 }
+
+types getType( string symbol){
+    return BOOL;
+}
+
+void updateSymbolValue( string symbol, Types value ){
+
+}
+
+bool exist(string symbol){
+
+}
+
+TableEntry getSymbolEntry( string name ){
+    for (auto table : tablesStack) {
+    }
+}
+
