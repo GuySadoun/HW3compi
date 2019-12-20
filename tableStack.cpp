@@ -88,47 +88,12 @@ string symbolTable::getStringVal(string symbol) {
     }
 }
 
-Enumerator symbolTable::getEnumeratorVal(string symbol) {
-    for (auto table : tablesStack) {
-        for (auto entry : table->scopeTable) {
-            if(( entry->name == symbol) && (entry->type == "string" )) {
-                return entry->val.enumerator;
-            }
-            else {
-                // TODO throw the right exception
-                string exceptionMessage("error Undef");
-                throw (TblErr(exceptionMessage));
-            }
-        }
-    }
-}
-
-EnumeratorList symbolTable::getEnumListVal(string symbol) {
-    return EnumeratorList(EnumeratorList(), Enumerator());
-}
-
-types symbolTable::getTypeVal(string symbol) {
-    return INT;
-}
-
 bool symbolTable::getBoolVal(string symbol) {
     return false;
 }
 
 int symbolTable::getIntegerVal(string symbol) {
     return 0;
-}
-
-Expression *symbolTable::getExpVal(string symbol) {
-    return nullptr;
-}
-
-Call symbolTable::getCallVal(string symbol) {
-    return Call();
-}
-
-string symbolTable::valuesToString(Types symbolValue) {
-    return (string)symbolValue;
 }
 
 Types symbolTable::findSymbol(string symbol) {
