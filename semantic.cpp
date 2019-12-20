@@ -82,9 +82,14 @@ void semantic::cast(Types &target, Types &a, Types &b, string sign, int lineno) 
 
 }
 
-void semantic::enumdecl(Types &target, string name, string enumValues, int lineno){
-    target.Exp.val.boolean = a.Exp.val.boolean && b.Exp.val.boolean;
-    target.Exp.type = BOOL;
+void semantic::enumdecl( Types &target, string name, EnumeratorList enumValues, int lineno){
+    target.Enum.type( EnumType( name )),
+    target.Enum.values = enumValues;
+}
+
+void semantic::enumeratorlist( Types &target, Enumerator name, int lineno ){
 
 }
+
+void semantic::enumerator( Type &target, )
 

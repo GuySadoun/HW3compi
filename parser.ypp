@@ -89,7 +89,9 @@ Enums : %empty { printProductionRule(5); }
     | EnumDecl Enums { printProductionRule(6); }
     ;
 
-EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { printProductionRule(7); }
+EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC {
+    semantic::enumdecl($$, $2, $4, yylineno);
+ }
     ;
 
 RetType : Type { printProductionRule(8); }
@@ -108,7 +110,7 @@ FormalDecl : Type ID InsertDecl { printProductionRule(14); }
     | EnumType ID { printProductionRule(15); }
     ;
 
-EnumeratorList : Enumerator { printProductionRule(16); }
+EnumeratorList : Enumerator { semantic::enumeratorlist($$, $1, yylineno); }
     | EnumeratorList COMMA Enumerator { printProductionRule(17); }
     ;
 

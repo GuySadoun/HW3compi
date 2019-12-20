@@ -47,20 +47,11 @@ typedef union {
 } Value;
 
 
-class Enums {
-    string name;
-    std::vector<string> enumarators;
-public:
-    explicit Enums(string str) {
-        name = "enum" + str;
-    }
+struct Enums {
+    vector<EnumDecl> enumerators;
 
-    string getName() {
-        return name;
-    }
-
-    void addEnumarator(string enumarator) {
-        enumarators.push_back(enumarator);
+    void addEnumarator(EnumDecl enumerator) {
+        enumerators.push_back(enumerator);
     }
 };
 
@@ -105,20 +96,21 @@ struct EnumType {
         enumType = "enum" + id;
     }
 };
-
-struct EnumDecl : BasicDeclInfo {
-    EnumType namedType;
-    vector<Enumerator> values;
-};
-
 struct Enumerator {
-    int num;
+    int index;
     string value;
 };
 
 struct EnumeratorList {
+    int index = 0;
     vector<Enumerator> values;
 };
+
+struct EnumDecl : BasicDeclInfo {
+    EnumType namedType;
+    EnumeratorList values;
+};
+
 
 
 struct NamedType {
@@ -172,7 +164,6 @@ typedef union {
     bool boolean;
     types type;
     string str;
-    Enums enums;
     Call call;
     Expression Exp;
 } Types;
