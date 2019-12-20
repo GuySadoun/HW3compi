@@ -23,14 +23,14 @@ Table::~Table() {
     }
 }
 
-bool Table::existInTable(string name) {
+bool Table::existInTable(const string& name) {
     for (auto &entry : scopeTable) {
         if (entry->name == name) return true;
     }
     return false;
 }
 
-void symbolTable::checkTableEmpty(string expMessage) {
+void symbolTable::checkTableEmpty(const string& expMessage) {
     if (tablesStack.empty()) {
         string exceptionMessage("empty table");
         throw (TblErr(exceptionMessage));
@@ -52,7 +52,7 @@ void symbolTable::endScope() {
     offsetStack.endScope();
 }
 
-void symbolTable::newVar(string symbol, types type, Types &value) {
+void symbolTable::newVar(const string& symbol, types type, Types &value) {
 
     for (auto table : tablesStack) {
         if (table->existInTable(symbol)) {
@@ -64,7 +64,7 @@ void symbolTable::newVar(string symbol, types type, Types &value) {
     offsetStack.incTop();
 }
 
-void symbolTable::updateSymbolValue(string symbol, Types value) {
+void symbolTable::updateSymbolValue(const string& symbol, Types value) {
 
     for (auto table : tablesStack) {
         if (table->existInTable(symbol)) {
@@ -124,7 +124,7 @@ bool symbolTable::getBoolVal(const string& symbol) {
     }
 }
 
-int symbolTable::getIntegerVal(string symbol) {
+int symbolTable::getIntegerVal(const string& symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == INT)) {

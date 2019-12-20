@@ -34,24 +34,24 @@ struct Table {
     vector<TableEntry*> scopeTable;
     Table() = default;
     void newLine(string name, types type, int off, Types & value);
-    bool existInTable(string name);
+    bool existInTable(const string& name);
     ~Table();
 };
 class symbolTable {
     vector<Table*> tablesStack;
     OffsetStack offsetStack;
-    void checkTableEmpty( string expMessage);
+    void checkTableEmpty( const string& expMessage);
 public:
 
     symbolTable() = default;
     void newScope();
     void endScope();
 
-    void newVar(string name, types type, Types & value);
-    void updateSymbolValue(string name, Types value);
+    void newVar(const string& name, types type, Types & value);
+    void updateSymbolValue(const string& name, Types value);
 
     string getStringVal(const string& symbol);
-    int getIntegerVal(string symbol);
+    int getIntegerVal(const string& symbol);
     bool getBoolVal(const string& symbol);
     FuncDecl getFuncVal(const string& symbol);
 
