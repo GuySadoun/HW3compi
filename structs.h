@@ -77,11 +77,11 @@ struct EnumeratorList {
     unordered_map<string, Enumerator> values;
 
     EnumeratorList(Enumerator e) {
-        values[e.enumName] = e;
+        this->values[e.enumName] = e;
     }
 
-    EnumeratorList(EnumeratorList elist, Enumerator e) : values(std::move(elist.values)) {
-        values[e.enumName] = e;
+    EnumeratorList(EnumeratorList elist, Enumerator e) : values(elist.values) {
+        this->values[e.enumName] = e;
     }
 };
 
@@ -118,9 +118,11 @@ struct Expression : BasicDeclInfo {
 struct ExpList {
     vector<Expression> args;
 
-    ExpList(ExpList expList, Expression exp) {
-        args = expList.args;
-        args.push_back(exp);
+    ExpList(ExpList expList, Expression exp) : args(expList.args) {
+        this->args.push_back(exp);
+    }
+    ExpList(Expression exp) {
+        this->args
     }
 };
 
@@ -188,6 +190,16 @@ typedef union {
     Expression exp;
     EnumDecl enumDecl;
     EnumType enumType;
+    ExpList expList;
+    FuncDecl funcDecl;
+    Funcs funcs;
+    Enums enums;
+    RetType retType;
+    Formals formals;
+    FormalsList formalsList;
+    FormalDecl formalDecl;
+    Statements statements;
+    Statement statement;
 } Types;
 
 extern Enums declared;

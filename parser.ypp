@@ -111,8 +111,8 @@ FormalDecl : Type ID InsertDecl { printProductionRule(14); }
     | EnumType ID { printProductionRule(15); }
     ;
 
-EnumeratorList : Enumerator { semantic::enumeratorlist1($$, $1, yylineno); }
-    | EnumeratorList COMMA Enumerator { semantic::enumeratorlist2($$, $1, $3, yylineno); }
+EnumeratorList : Enumerator { semantic::enumeratorlist($$, $1, yylineno); }
+    | EnumeratorList COMMA Enumerator { semantic::enumeratorlist($$, $1, $3, yylineno); }
     ;
 
 Enumerator : ID { printProductionRule(18); }
@@ -144,12 +144,12 @@ NewScope : %empty {
                         symbolTable->newScope();
                    }
 
-Call : ID LPAREN ExpList RPAREN { printProductionRule(36); }
+Call : ID LPAREN ExpList RPAREN { semantic::callCreate($$,  }
     | ID LPAREN RPAREN { printProductionRule(37); }
     ;
 
-ExpList : Exp { printProductionRule(38); }
-    | Exp COMMA ExpList { printProductionRule(39); }
+ExpList : Exp { semantic::expList($$, $1); }
+    | Exp COMMA ExpList { semantic::expList($$, $3, $1); }
     ;
 
 Type : INT { currRetType = "int"; }

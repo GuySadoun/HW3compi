@@ -24,6 +24,7 @@ public:
 struct Table {
     struct TableEntry {
         string name;
+        string typeStr;
         types type;
         int offset;
         Types &val;
@@ -41,6 +42,7 @@ class symbolTable {
     vector<Table*> tablesStack;
     OffsetStack offsetStack;
     void checkTableEmpty( const string& expMessage);
+    string typeToStr(types t);
 public:
 
     symbolTable() = default;

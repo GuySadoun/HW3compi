@@ -12,7 +12,7 @@ using std::cout;
 using std::endl;
 
 //----------------------------builtInFunc--------------------------------//
-void print(string str) {
+void print(const string& str) {
     cout << str << endl;
 }
 
@@ -21,7 +21,7 @@ void printi(int n) {
 }
 //-----------------------------------------------------------------------//
 
-void semantic::binop(Types &target, Types &a, Types &b, string sign, int lineno) {
+void semantic::binop(Types &target, Types &a, Types &b, const string& sign, int lineno) {
     if (a.exp.isNumber() && b.exp.isNumber())  {
         if (sign == "+") {
             target.exp.val.integer = a.exp.val.integer + b.exp.val.integer;
@@ -42,7 +42,7 @@ void semantic::binop(Types &target, Types &a, Types &b, string sign, int lineno)
     }
 }
 
-void semantic::relop(Types &target, Types &a, Types &b, string sign, int lineno) {
+void semantic::relop(Types &target, Types &a, Types &b, const string& sign, int lineno) {
     if (a.exp.isNumber() && b.exp.isNumber()) {
         if (sign == "<") {
             target.exp.val.boolean = (a.exp.val.integer < b.exp.val.integer);
@@ -102,6 +102,7 @@ void semantic::call(Types &target, Types &call, int lineno) {
                     cout << arg.val.enumType.name;
                     break;
                 case FUNC:
+                    //TODO: repair!!!
                     errorPrototypeMismatch(lineno, arg.id, arg.val.funType.);
 
             }
@@ -131,17 +132,17 @@ void semantic::cast(Types &target, Types &to, Types &exp, int lineno) {
 }
 
 void semantic::enumdecl( Types &target, string name, EnumeratorList enumValues, int lineno){
-    EnumDecl enumDecl(std::move(name), enumValues);
+    EnumDecl enumDecl(std::move(name), std::move(enumValues));
     target.enumDecl = enumDecl;
     declared.declaredEnums[enumDecl.namedType] = enumDecl;
 }
 
-void semantic::enumeratorlist1(Types &target, Types& enumerator, int lineno) {
+void semantic::enumeratorlist(Types &target, Types& enumerator, int lineno) {
     EnumeratorList enumList(enumerator.enumerator);
     target.enumeratorList = enumList;
 }
 
-void semantic::enumeratorlist2(Types &target, Types &enumeratorList, Types& enumerator, int lineno) {
+void semantic::enumeratorlist(Types &target, Types &enumeratorList, Types& enumerator, int lineno) {
     EnumeratorList enumList(enumerator.enumerator);
     target.enumeratorList = enumList;
 }
@@ -149,6 +150,15 @@ void semantic::enumeratorlist2(Types &target, Types &enumeratorList, Types& enum
 void semantic::enumType(Types &target, string name, int lineno) {
     EnumType eType(std::move(name));
     target.enumType = eType;
+}
+
+void semantic::expList(Types &target, ExpList expList, Types &exp) {
+    vector<Expression> vec(expList.args);
+    target.expList.args = vec;
+}
+
+void semantic::expList(Types &target, Types &exp) {
+
 }
 
 

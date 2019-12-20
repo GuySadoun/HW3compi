@@ -29,11 +29,11 @@ public:
 
 using std::string;
 namespace semantic {
-    void binop(Types &target, Types &a, Types &b, string sign, int lineno);
+    void binop(Types &target, Types &a, Types &b, const string& sign, int lineno);
 
     void logicop(Types &target, Types &a, Types &b, string sign, int lineno);
 
-    void relop(Types &target, Types &a, Types &b, string sign, int lineno);
+    void relop(Types &target, Types &a, Types &b, const string& sign, int lineno);
 
     void cast(Types &target, Types &a, Types &b, int lineno);
 
@@ -41,14 +41,16 @@ namespace semantic {
 
     void bytecheck(Types &target, Types &byte, int lineno);
 
-    void enumeratorlist1(Types &target, Types &enumerator, int lineno);
+    void enumeratorlist(Types &target, Types &enumerator, int lineno);
 
-    void enumeratorlist2(Types &target, Types &enumeratorList, Types &enumerator, int lineno);
+    void enumeratorlist(Types &target, Types &enumeratorList, Types &enumerator, int lineno);
 
     void enumdecl(Types &target, string name, EnumeratorList enumValues, int lineno);
 
     void enumType(Types &target, string name, int lineno);
 
     void expList(Types &target, Types &exp);
+
+    void expList(Types &target, ExpList expList, Types &exp);
 }
 #endif //HW3COMPI_SEMANTIC_H

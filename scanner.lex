@@ -92,5 +92,5 @@ continue                    return CONTINUE;
                                    return STRING;
                                }
 {whitespace}				;
-.                           yylval = 1;
+.                           errorLex(yylineno);
 %%
