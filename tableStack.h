@@ -26,13 +26,14 @@ struct Table {
         string name;
         types type;
         int offset;
-        Types val;
+        Types &val;
 
-        TableEntry(string name, string type, int offset) : name(name), type(type), offset(offset) {}
+        TableEntry(string name, types type, int offset, Types & val) :
+                        name(name), type(type), offset(offset), val(val) {}
     };
     vector<TableEntry*> scopeTable;
     Table() = default;
-    void newLine(string name, types type, int off);
+    void newLine(string name, types type, int off, Types & value);
     bool existInTable(string name);
     ~Table();
 };
@@ -41,14 +42,14 @@ class symbolTable {
     OffsetStack offsetStack;
 public:
     symbolTable() = default;
-    void newVar(string name, string type);
+    void newVar(string name, types type, Types & value);
     void newScope();
     void endScope();
     bool exist(string symbol);
     string getStringVal(string symbol);
     int getIntegerVal(string symbol);
     bool getBoolVal(string symbol);
-    Call getCallVal( string symbol );
+    FuncDecl getFuncVal(string symbol);
 };
 
 #endif //HW3COMPI_TABLESTACK_H

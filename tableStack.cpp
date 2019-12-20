@@ -3,22 +3,24 @@
 //
 
 #include "tableStack.h"
+void Table::newLine(string name, types type, int off, Types &value) {
 
-void Table::newLine(string name, string type, int off) {
     if (scopeTable.empty()) {
         string exceptionMessage("new line to empty scopeTable");
         throw (TblErr(exceptionMessage));
     }
-    scopeTable.push_back(*(new TableEntry(name, type, off)));
-}
 
-symbolTable::Table::~Table() {
+    // TODO no matching member function for call to push_back
+    scopeTable.push_back(*(new TableEntry(name, type, off, value )));
+
+}
+Table::~Table() {
     for (auto entry : scopeTable) {
         delete &entry;
     }
 }
 
-bool symbolTable::Table::existInTable(string name) {
+bool Table::existInTable(string name) {
     for (auto &entry : scopeTable) {
         if (entry->name == name) return true;
     }
@@ -26,17 +28,8 @@ bool symbolTable::Table::existInTable(string name) {
 }
 
 
-Table::TableEntry symbolTable::getSymbolEntry (string symbol){
 
-
-    for (auto table : tablesStack) {
-        if (table->existInTable(symbol)) {
-            return table->getEntryfromScope(symbol);
-        }
-    }
-}
-
-void symbolTable::newVar( string symbol, string type, Types value ) {
+void symbolTable::newVar( string symbol, types type, Types & value ) {
     if (tablesStack.empty()) {
         string exceptionMessage("new var with empty");
         throw (TblErr(exceptionMessage));
@@ -47,7 +40,7 @@ void symbolTable::newVar( string symbol, string type, Types value ) {
             throw (TblErr(exceptionMessage));
         }
     }
-    tablesStack.front()->newLine(symbol, type, offsetStack.getTop());
+    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value );
     offsetStack.incTop();
 }
 
@@ -67,40 +60,62 @@ void symbolTable::endScope() {
     offsetStack.endScope();
 }
 
-bool symbolTable::exist(string str) {
-    // go lifo in the vector, look for the symbol
-
-    return false;
-}
-
 string symbolTable::getStringVal(string symbol) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
-            if(( entry->name == symbol) && (entry->type == "string" )) {
+            if(( entry->name == symbol) && (entry->type == STRING )) {
                 return entry->val.str;
             }
             else {
                 // TODO throw the right exception
-                string exceptionMessage("error Undef");
-                throw (TblErr(exceptionMessage));
+                throw (TblErr("error Undefined"));
             }
         }
     }
 }
 
 bool symbolTable::getBoolVal(string symbol) {
-    return false;
+    for (auto table : tablesStack) {
+        for (auto entry : table->scopeTable) {
+            if(( entry->name == symbol) && (entry->type == BOOL)) {
+                return entry->val.boolean;
+            }
+            else {
+                // TODO throw the right exception
+                throw (TblErr("error Undefined"));
+            }
+        }
+    }
 }
 
 int symbolTable::getIntegerVal(string symbol) {
-    return 0;
+    for (auto table : tablesStack) {
+        for (auto entry : table->scopeTable) {
+            if(( entry->name == symbol) && (entry->type == INT )) {
+                return entry->val.integer;
+            }
+            else {
+                // TODO throw the right exception
+                throw (TblErr("error Undefined"));
+            }
+        }
+    }
 }
 
-Types symbolTable::findSymbol(string symbol) {
-
-    //getSymbolEntry
-    Types result;
-    return result;
+FuncDecl symbolTable::getFuncVal(string symbol) {
+    for (auto table : tablesStack) {
+        for (auto entry : table->scopeTable) {
+            if(( entry->name == symbol) && (entry->type == FUNC )) {
+                // TODO: add FuncDecl to union types
+                return FuncDecl();
+                //return entry->val.func;
+            }
+            else {
+                // TODO throw the right exception
+                throw (TblErr("error Undefined"));
+            }
+        }
+    }
 }
 
 types getType( string symbol){
@@ -111,26 +126,17 @@ void updateSymbolValue( string symbol, Types value ){
 
 }
 
-bool exist(string symbol){
+bool symbolTable::exist(string symbol) {
 
-}
-
-TableEntry getSymbolEntry( string name ){
+    // go lifo in the vector, look for the symbol
+    bool exists = false;
     for (auto table : tablesStack) {
+        if (table->existInTable(symbol))
+            exists = true;
     }
+    return exists;
+
 }
-
-
-//bool symbolTable::exist(string str) {
-//    // go lifo in the vector, look for the symbol
-//    bool exists = false;
-//    for (auto table : tablesStack) {
-//        if (table->existInTable(symbol))
-//            exists = true;
-//    }
-//    return exists;
-//
-//}
 //Types & symbolTable::findSymbol(string symbol) {
 //
 //    return getSymbolEntry(symbol).val;
