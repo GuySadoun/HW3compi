@@ -59,8 +59,7 @@ string Table::typeToStr(types type){
 
 void symbolTable::checkTableEmpty(const string& expMessage) {
     if (tablesStack.empty()) {
-        string exceptionMessage("empty table");
-        throw (TblErr(exceptionMessage));
+        //TODO
     }
 }
 
@@ -83,7 +82,7 @@ void symbolTable::newVar(const string& symbol, types type, Types &value, int lin
 
     for (auto table : tablesStack) {
         if (table->existInTable(symbol)) {
-            output::errorDef( lineNum, symbol);
+            //TODO error
         }
     }
     tablesStack.front()->newLine(symbol, type,  ,offsetStack.getTop(), value);
@@ -133,6 +132,7 @@ string symbolTable::getStringVal(const string& symbol, int lineNum) {
         }
     }
     output::errorUndef( lineNum, symbol );
+    exit(1);
 }
 
 bool symbolTable::getBoolVal(const string& symbol, int lineNum) {
@@ -144,6 +144,7 @@ bool symbolTable::getBoolVal(const string& symbol, int lineNum) {
         }
     }
     output::errorUndef( lineNum, symbol );
+    exit(1);
 }
 
 int symbolTable::getIntegerVal(const string& symbol, int lineNum) {
@@ -155,6 +156,7 @@ int symbolTable::getIntegerVal(const string& symbol, int lineNum) {
         }
     }
     output::errorUndef( lineNum, symbol );
+    exit(1);
 }
 
 FuncDecl symbolTable::getFuncVal(const string& symbol, int lineNum) {
@@ -168,6 +170,7 @@ FuncDecl symbolTable::getFuncVal(const string& symbol, int lineNum) {
         }
     }
     output::errorUndefFunc( lineNum, symbol );
+    exit(1);
 }
 
 bool symbolTable::exist(const string& symbol) {

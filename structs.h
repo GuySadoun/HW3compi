@@ -24,6 +24,7 @@ enum statType {
     DECL, FLOW, LOOP, SCOPE, ASSIGN
 };
 
+
 struct Program;
 struct Enums;
 struct Funcs;
@@ -51,9 +52,12 @@ struct Funcs {
     vector<FuncDecl> funcDeclarations;
 };
 
+struct Flow{
+    types retType;
+};
+
 struct EnumType {
     string name;
-
     // the type of enum ID is set to be enumID
     explicit EnumType(const string id) {
         name = "enum" + id;
@@ -122,31 +126,57 @@ struct ExpList {
         this->args.push_back(exp);
     }
     ExpList(Expression exp) {
-        this->args
+        this->args.push_back(exp);
     }
 };
 
 struct Call : BasicDeclInfo {
     // the returned type ?
     string name;
-    types type;
     ExpList args;
+    types returnType;
+
+    Call( string id, ExpList expList) : args(expList), name(id) {}
+    Call( string id): name(id){}
 };
 
 struct Formals : BasicDeclInfo {
-    // TODO: what about enums
+    FormalsList formalList;
 };
 
 struct FormalDecl : BasicDeclInfo {
     types type;
+    EnumType enumType;
+    string id;
 };
 
 struct FormalsList {
-    vector<FormalDecl> FunDeclParams;
+    vector<FormalDecl> funDeclParams;
+
+    FormalsList( FormalDecl formalDecl, FormalsList list) : funDeclParams(list.funDeclParams ) {
+        this->funDeclParams.push_back(formalDecl);
+    }
+    FormalsList( FormalDecl formalDecl ){
+        this->funDeclParams.push_back(formalDecl);
+    }
+
+    vector<string> formalsToStr() {
+        vector<string> ret;
+        for ( auto formalDecl : funDeclParams ) {
+            ret.insert( ret.begin(), formalDecl.type );
+        }
+        return ret;
+    }
 };
 
 struct Statement {
     statType statType;
+    FormalDecl formalDecl;
+    EnumType enumType;
+    EnumDecl enumDecl;
+    Expression exp;
+    Call call;
+
 };
 
 struct Statements {

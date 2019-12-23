@@ -108,8 +108,7 @@ void semantic::call(Types &target, Types &call, int lineno) {
             }
         }
     }
-    target.exp.type = call.call.type;
-    target.exp.lineNum = call.call.lineNum;
+    target.exp.type = call.call.returnType;
 }
 
 void semantic::bytecheck(Types &target, Types &byte, int lineno) {
@@ -160,6 +159,39 @@ void semantic::expList(Types &target, Types &expList, Types &exp) {
 void semantic::expList(Types &target, Types & expList) {
     ExpList expList1(expList.expList);
     target.expList = expList1;
+}
+
+void semantic::callCreate(Types &target, const string& id, Types &expList, int lineno) {
+    if (!symbolTable.exist(id)) {
+        errorUndefFunc(lineno, id);
+        exit(1);
+    }
+    FuncDecl ret = symbolTable.getFuncVal(id, lineno);
+    FormalsList formalList = FormalsList(ret.formals);
+    vector<string> strParams = formalList.formalsToStr();
+
+    if (expList.expList.args.size() != formalList.funDeclParams.size()){
+        errorPrototypeMismatch(lineno, id, strParams);
+        exit(1);
+    }
+    for (int i = 0; i < expList.expList.args.size(); ++i) {
+        if(expList.expList.args.at(i).type != formalList.funDeclParams.at(i).type ){
+            errorPrototypeMismatch(lineno, id, strParams);
+            exit(1);
+        }
+    }
+    Call call = Call( id, expList.expList );
+    target.call = call;
+}
+
+void semantic::callCreate(Types &target, const string& id, int lineno) {
+    if (!symbolTable.exist(id)){
+        errorUndefFunc(lineno, id);
+        exit(1);
+    }
+
+    Call call = Call( id );
+    target.call = call;
 }
 
 

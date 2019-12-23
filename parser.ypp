@@ -78,13 +78,9 @@ Funcs : %empty { printProductionRule(2); }
     | FuncDecl Funcs { printProductionRule(3); }
     ;
 
-FuncDecl : RetType ID InsertDecl LPAREN Formals RPAREN  LBRACE NewScope Statements RBRACE { printProductionRule(4); }
+FuncDecl : RetType ID LPAREN Formals RPAREN  LBRACE NewScope Statements RBRACE { printProductionRule(4); }
     ;
 
-InsertDecl : %empty {
-                        if (!symbolTable) symbolTable = new symbolTable;
-                        symbolTable->newVar((string)yytext,
-                    }
 
 Enums : %empty { printProductionRule(5); }
     | EnumDecl Enums { printProductionRule(6); }
@@ -107,7 +103,7 @@ FormalsList : FormalDecl { printProductionRule(12); }
     | FormalDecl COMMA FormalsList { printProductionRule(13); }
     ;
 
-FormalDecl : Type ID InsertDecl { printProductionRule(14); }
+FormalDecl : Type ID { printProductionRule(14); }
     | EnumType ID { printProductionRule(15); }
     ;
 
@@ -144,8 +140,8 @@ NewScope : %empty {
                         symbolTable->newScope();
                    }
 
-Call : ID LPAREN ExpList RPAREN { semantic::callCreate($$,  }
-    | ID LPAREN RPAREN { printProductionRule(37); }
+Call : ID LPAREN ExpList RPAREN { semantic::callCreate($$, $1, $3, yylineno); }
+    | ID LPAREN RPAREN { semantic::callCreate($$, $1, yylineno); }
     ;
 
 ExpList : Exp { semantic::expList($$, $1); }

@@ -52,5 +52,10 @@ namespace semantic {
     void expList(Types &target, Types &exp);
 
     void expList(Types &target, Types &expList, Types &exp);
+
+    void callCreate(Types &target, const string& id, Types &expList, int lineno);
+
+    void callCreate(Types &target, const string& id, int lineno);
+
 }
 #endif //HW3COMPI_SEMANTIC_H
