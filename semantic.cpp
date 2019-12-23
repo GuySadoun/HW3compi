@@ -6,13 +6,14 @@
 #include <utility>
 #include "semantic.h"
 #include "structs.h"
+#include "hw3_output.hpp"
 
 using namespace output;
 using std::cout;
 using std::endl;
 
 //----------------------------builtInFunc--------------------------------//
-void print(const string& str) {
+void print(const string &str) {
     cout << str << endl;
 }
 
@@ -21,8 +22,8 @@ void printi(int n) {
 }
 //-----------------------------------------------------------------------//
 
-void semantic::binop(Types &target, Types &a, Types &b, const string& sign, int lineno) {
-    if (a.exp.isNumber() && b.exp.isNumber())  {
+void semantic::binop(Types &target, Types &a, Types &b, const string &sign, int lineno) {
+    if (a.exp.isNumber() && b.exp.isNumber()) {
         if (sign == "+") {
             target.exp.val.integer = a.exp.val.integer + b.exp.val.integer;
         } else if (sign == "-") {
@@ -38,11 +39,11 @@ void semantic::binop(Types &target, Types &a, Types &b, const string& sign, int 
         if (a.exp.isInt() || b.exp.isInt()) target.exp.type = INT;
         else target.exp.type = BYTE;
     } else {
-        output::errorSyn(lineno);
+        errorSyn(lineno);
     }
 }
 
-void semantic::relop(Types &target, Types &a, Types &b, const string& sign, int lineno) {
+void semantic::relop(Types &target, Types &a, Types &b, const string &sign, int lineno) {
     if (a.exp.isNumber() && b.exp.isNumber()) {
         if (sign == "<") {
             target.exp.val.boolean = (a.exp.val.integer < b.exp.val.integer);
@@ -58,11 +59,11 @@ void semantic::relop(Types &target, Types &a, Types &b, const string& sign, int 
         }
         target.exp.type = BOOL;
     } else {
-        output::errorSyn(lineno);
+        errorSyn(lineno);
     }
 }
 
-void semantic::logicop(Types &target, Types &a, Types &b, const string& sign, int lineno) {
+void semantic::logicop(Types &target, Types &a, Types &b, const string &sign, int lineno) {
     if (a.exp.isBool() && b.exp.isBool()) {
         if (sign == "and") {
             target.exp.val.boolean = (a.exp.val.boolean && b.exp.val.boolean);
@@ -75,7 +76,7 @@ void semantic::logicop(Types &target, Types &a, Types &b, const string& sign, in
             throw (semErr(exceptionMessage));
         }
     } else {
-        output::errorSyn(lineno);
+        errorSyn(lineno);
     }
     target.exp.type = BOOL;
 }
@@ -111,14 +112,14 @@ void semantic::call(Types &target, Types &call, int lineno) {
 }
 
 void semantic::bytecheck(Types &target, Types &byte, int lineno) {
-    if (byte.integer > 255) output::errorByteTooLarge(lineno, std::to_string(byte.integer));
+    if (byte.integer > 255) errorByteTooLarge(lineno, std::to_string(byte.integer));
     target.exp.val.integer = byte.integer;
     target.exp.type = BYTE;
 }
 
 void semantic::cast(Types &target, Types &to, Types &exp, int lineno) {
     if (exp.exp.type != ENUM || to.type != INT) {
-        output::errorMismatch(lineno);
+        errorMismatch(lineno);
         exit(1);
     }
     if (!symbolTable.exist(exp.exp.id)) {
@@ -129,18 +130,18 @@ void semantic::cast(Types &target, Types &to, Types &exp, int lineno) {
     target.exp.val.integer = symbolTable.getIntegerVal(exp.exp.id);
 }
 
-void semantic::enumdecl( Types &target, string name, EnumeratorList enumValues, int lineno){
+void semantic::enumdecl(Types &target, string name, EnumeratorList enumValues, int lineno) {
     EnumDecl enumDecl(std::move(name), std::move(enumValues));
     target.enumDecl = enumDecl;
     declared.declaredEnums[enumDecl.namedType.name] = enumDecl;
 }
 
-void semantic::enumeratorlist(Types &target, Types& enumerator, int lineno) {
+void semantic::enumeratorlist(Types &target, Types &enumerator, int lineno) {
     EnumeratorList enumList(enumerator.enumerator);
     target.enumeratorList = enumList;
 }
 
-void semantic::enumeratorlist(Types &target, Types &enumeratorList, Types& enumerator, int lineno) {
+void semantic::enumeratorlist(Types &target, Types &enumeratorList, Types &enumerator, int lineno) {
     EnumeratorList enumList(enumerator.enumerator);
     target.enumeratorList = enumList;
 }
@@ -155,41 +156,41 @@ void semantic::expList(Types &target, Types &expList, Types &exp) {
     target.expList = expList1;
 }
 
-void semantic::expList(Types &target, Types & expList) {
+void semantic::expList(Types &target, Types &expList) {
     ExpList expList1(expList.expList);
     target.expList = expList1;
 }
 
-void semantic::callCreate(Types &target, const string& id, Types &expList, int lineno) {
+void semantic::callCreate(Types &target, const string &id, Types &expList, int lineno) {
     if (!symbolTable.exist(id)) {
-        output::errorUndefFunc(lineno, id);
+        errorUndefFunc(lineno, id);
         exit(1);
     }
     FuncDecl ret = symbolTable.getFuncVal(id, lineno);
     FormalsList formalList = FormalsList(ret.formals);
     vector<string> strParams = formalList.formalsToStr();
 
-    if (expList.expList.args.size() != formalList.funDeclParams.size()){
-        output::errorPrototypeMismatch(lineno, id, strParams);
+    if (expList.expList.args.size() != formalList.funDeclParams.size()) {
+        errorPrototypeMismatch(lineno, id, strParams);
         exit(1);
     }
     for (int i = 0; i < expList.expList.args.size(); ++i) {
-        if(expList.expList.args.at(i).type != formalList.funDeclParams.at(i).type ){
-            output::errorPrototypeMismatch(lineno, id, strParams);
+        if (expList.expList.args.at(i).type != formalList.funDeclParams.at(i).type) {
+            errorPrototypeMismatch(lineno, id, strParams);
             exit(1);
         }
     }
-    Call call = Call( id, expList.expList );
+    Call call = Call(id, expList.expList);
     target.call = call;
 }
 
-void semantic::callCreate(Types &target, const string& id, int lineno) {
-    if (!symbolTable.exist(id)){
-        output::errorUndefFunc(lineno, id);
+void semantic::callCreate(Types &target, const string &id, int lineno) {
+    if (!symbolTable.exist(id)) {
+        errorUndefFunc(lineno, id);
         exit(1);
     }
 
-    Call call = Call( id );
+    Call call = Call(id);
     target.call = call;
 }
 
@@ -198,7 +199,7 @@ void semantic::block(Types &target, Types &code) {
     symbolTable.endScope();
 }
 
-void semantic::varDecl(Types &target, types type, string id, int lineno) {
+void semantic::varDecl(Types &target, types type, const string &id, int lineno) {
     symbolTable.newDecl(id, type, lineno);
 }
 
@@ -214,11 +215,11 @@ void semantic::declAndAssign(Types &target, types type, string id, Types &exp, i
 }
 
 void semantic::enumTypeAssign(Types &target, Types &enumType, string id, Types &exp, int lineno) {
-    if(declared.declaredEnums.find(enumType.enumDecl.namedType.name) == declared.declaredEnums.end()) {
+    if (declared.declaredEnums.find(enumType.enumDecl.namedType.name) == declared.declaredEnums.end()) {
         errorUndefEnum(lineno, id);
         exit(1);
     } else if (declared.declaredEnums.find(enumType.enumDecl.namedType.name)->second.values.values.find(id) ==
-            declared.declaredEnums.find(enumType.enumDecl.namedType.name)->second.values.values.end()){
+               declared.declaredEnums.find(enumType.enumDecl.namedType.name)->second.values.values.end()) {
         errorUndefEnumValue(lineno, enumType.enumType.name);
         exit(1);
     }
@@ -234,8 +235,8 @@ void semantic::assign(Types &target, string &id, Types &exp, int lineno) {
 
 void semantic::ifStatement(Types &target, Types &exp, Types &statement, int lineno) {
 
-    if( !exp.exp.isBool() ){
-        output::errorMismatch( lineno );
+    if (!exp.exp.isBool()) {
+        errorMismatch(lineno);
         exit(1);
     }
 
@@ -245,8 +246,8 @@ void semantic::ifStatement(Types &target, Types &exp, Types &statement, int line
 
 void semantic::ifElseStatement(Types &target, Types &exp, Types &statement1, Types &statement2, int lineno) {
 
-    if( !exp.exp.isBool() ){
-        output::errorMismatch( lineno );
+    if (!exp.exp.isBool()) {
+        errorMismatch(lineno);
         exit(1);
     }
 
@@ -254,10 +255,11 @@ void semantic::ifElseStatement(Types &target, Types &exp, Types &statement1, Typ
     target.statement.ifElseStat.statIf = statement1.statement;
     target.statement.ifElseStat.statElse = statement2.statement;
 }
-void semantic::whileStatement( Types &target, Types &exp, Types &statement, int lineno ) {
 
-    if( !exp.exp.isBool() ){
-        output::errorMismatch( lineno );
+void semantic::whileStatement(Types &target, Types &exp, Types &statement, int lineno) {
+
+    if (!exp.exp.isBool()) {
+        errorMismatch(lineno);
         exit(1);
     }
     target.statement.whileStat.cond = exp.exp;
@@ -265,6 +267,26 @@ void semantic::whileStatement( Types &target, Types &exp, Types &statement, int 
     target.statement.whileStat.whileScope.code.insideWhile = false;
 }
 
+void semantic::breakContinue(Types &target, bool isContinue, int lineno) {
+    if (!insideWhile && !isContinue) errorUnexpectedBreak(lineno);
+    else if (!insideWhile && isContinue) errorUnexpectedContinue(lineno);
+    target.statement.breakStatement = {.line = lineno, .isContinue = isContinue}
+}
 
+void semantic::enumVarDeck(Types &target, Types &enumType, const string &str, int lineno) {
+    if (declared.declaredEnums.find(enumType.enumType.name) == declared.declaredEnums.end()) {
+        errorUndefEnum(lineno, enumType.enumType.name);‬‬
+    }
+    EnumType enumType1(str);
+    target.formalDecl.enumType = enumType1;
+    symbolTable.newDecl(str, ENUM, lineno);
+}
+
+void semantic::typeVarDec(Types &target, Types &type, const string &str, int lineno) {
+    if (symbolTable.exist(str)) {
+        errorDef(lineno, str);
+    }
+    symbolTable.newDecl(str, type.type, lineno);
+}
 
 

@@ -66,7 +66,7 @@ continue                    return CONTINUE;
                             }
 \+|\-                       {
                                 if (yytext = "+")
-                                    yylval.str = "+"errorSyn(yylineno);;
+                                    yylval.str = "+";
                                 else
                                     yylval.str = "-";
                                 return ADDITIVE;
@@ -92,5 +92,8 @@ continue                    return CONTINUE;
                                    return STRING;
                                }
 {whitespace}				;
-.                           errorLex(yylineno);
+.                           {
+                                errorLex(yylineno);
+                                exit(1);
+                            }
 %%

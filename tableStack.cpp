@@ -4,7 +4,6 @@
 
 #include "tableStack.h"
 #include <utility>
-
 using namespace output;
 void Table::newLine(string name, types type, int off, const Types& value) {
     scopeTable.insert( scopeTable.begin(),
@@ -27,7 +26,7 @@ bool Table::existInTable(const string& name) {
 string Table::typeToStr(types type, const Types& value) {
 
     string typeStr;
-    switch (type) {
+    switch(type) {
         case INT:
             typeStr = "int";
             break;
@@ -50,8 +49,8 @@ string Table::typeToStr(types type, const Types& value) {
         case VOID:
             typeStr = "void";
             break;
-
     }
+
     return typeStr;
 }
 

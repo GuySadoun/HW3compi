@@ -55,7 +55,7 @@ struct EnumType {
     string name;
     // the type of enum ID is set to be enumID
     explicit EnumType(const string id) {
-        name = "enum" + id;
+        name = "enum " + id;
     }
 };
 
@@ -68,7 +68,6 @@ typedef union {
 } Value;
 
 struct Enumerator {
-    string value;
     string enumName;
 };
 
@@ -176,6 +175,23 @@ struct Statement {
     ifStatement ifStat;
     ifElseStatement ifElseStat;
     whileStatement whileStat;
+    Flow breakStatement;
+};
+
+struct Statements {
+    vector<Statement> statements;
+    Statements(Statement s) {
+        this->statements.push_back(s);
+    }
+    Statements(Statements statements, Statement s) {
+        this->statements = statements;
+        this->statements.push_back(s);
+    }
+};
+
+struct Flow {
+    bool isContinue;
+    int line;
 };
 
 struct returnType {
@@ -197,11 +213,6 @@ struct ifElseStatement {
 struct whileStatement {
     Expression cond;
     Statement whileScope;
-};
-
-struct Statements {
-    bool insideWhile = false;
-    vector<Statement> statements;
 };
 
 struct RetType {
@@ -253,6 +264,8 @@ typedef union {
 
 extern Enums declared;
 extern symbolTable symbolTable;
+extern bool insideWhile = false;
+extern bool mainExist = false;
 
 #define YYSTYPE Types
 
