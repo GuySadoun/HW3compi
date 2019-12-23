@@ -15,6 +15,7 @@
 	#define YYSTYPE Types
 %}
 
+//TODO Do we need this?
 %union Types{
      int Integer;
      bool Boolean;
@@ -131,12 +132,25 @@ Statement : LBRACE NewScope Statements RBRACE { semantic::block($$, $3, yylineno
                         $$.statement.returnType.ret = true;
                         $$.statement.returnType.retVal = $2.exp;
                     }
-    | IF LPAREN Exp RPAREN Statement %prec NO_ELSE { semantic::ifStatement($$, $3, $5); }
-    | IF LPAREN Exp RPAREN Statement ELSE Statement { semantic::ifElseStatement($$, $3, $5, $7); }
-    | WHILE LPAREN Exp RPAREN Statement { printProductionRule(33); }
-    | BREAK SC { printProductionRule(34); }
-    | CONTINUE SC { printProductionRule(35); }
+    | IF LPAREN Exp RPAREN Statement %prec NO_ELSE { semantic::ifStatement($$, $3, $5, yylineno); }
+    | IF LPAREN Exp RPAREN Statement ELSE Statement { semantic::ifElseStatement($$, $3, $5, $7, yylineno); }
+    | WHILE MarkerWhileOn LPAREN Exp RPAREN Statement { semantic::whileStatement($$, $3.exp, $5, yylineno); }
+    | BREAK SC {
+        if ( ($$.statement.code.insideWhile == false){
+            errorUnexpectedBreak(yylineno);
+        }
+    }
+    | CONTINUE SC {
+        if ( ($$.statement.code.insideWhile == false){
+                 errorUnexpectedContinue(yylineno);
+        }
+    }
     ;
+    MarkerWhileOn : %empty {
+
+        $$.statement.whileStat.statWhile.code.insideWhile = true;
+
+    }
 
 NewScope : %empty {
                         if (!symbolTable) symbolTable = new symbolTable;

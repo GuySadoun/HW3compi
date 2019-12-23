@@ -69,8 +69,10 @@ namespace semantic {
 
     void assign(Types &target, string &id, Types &exp, int lineno);
 
-    void ifStatement(Types &target, Types &exp, Types &statement);
+    void ifStatement(Types &target, Types &exp, Types &statement, int lineno);
 
-    void ifElseStatement(Types &target, Types &exp, Types &statement1, Types &statement2);
+    void ifElseStatement(Types &target, Types &exp, Types &statement1, Types &statement2, int lineno);
+
+    void whileStatement( Types &target, Types &exp, Types &statement, int lineno  );
 }
 #endif //HW3COMPI_SEMANTIC_H

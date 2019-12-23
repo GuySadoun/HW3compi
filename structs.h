@@ -175,11 +175,12 @@ struct Statement {
     returnType retType;
     ifStatement ifStat;
     ifElseStatement ifElseStat;
+    whileStatement whileStat;
 };
 
 struct returnType {
     bool ret;
-    Expression retVal
+    Expression retVal;
 };
 
 struct ifStatement {
@@ -193,7 +194,13 @@ struct ifElseStatement {
     Statement statElse;
 };
 
+struct whileStatement {
+    Expression cond;
+    Statement whileScope;
+};
+
 struct Statements {
+    bool insideWhile = false;
     vector<Statement> statements;
 };
 

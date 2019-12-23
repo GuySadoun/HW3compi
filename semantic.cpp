@@ -232,15 +232,39 @@ void semantic::assign(Types &target, string &id, Types &exp, int lineno) {
     symbolTable.updateSymbolValue(id, exp, lineno);
 }
 
-void semantic::ifStatement(Types &target, Types &exp, Types &statement) {
+void semantic::ifStatement(Types &target, Types &exp, Types &statement, int lineno) {
+
+    if( !exp.exp.isBool() ){
+        output::errorMismatch( lineno );
+        exit(1);
+    }
+
     target.statement.ifStat.cond = exp.exp;
     target.statement.ifStat.stat = statement.statement;
 }
 
-void semantic::ifElseStatement(Types &target, Types &exp, Types &statement1, Types &statement2) {
+void semantic::ifElseStatement(Types &target, Types &exp, Types &statement1, Types &statement2, int lineno) {
+
+    if( !exp.exp.isBool() ){
+        output::errorMismatch( lineno );
+        exit(1);
+    }
+
     target.statement.ifElseStat.cond = exp.exp;
     target.statement.ifElseStat.statIf = statement1.statement;
     target.statement.ifElseStat.statElse = statement2.statement;
 }
+void semantic::whileStatement( Types &target, Types &exp, Types &statement, int lineno ) {
+
+    if( !exp.exp.isBool() ){
+        output::errorMismatch( lineno );
+        exit(1);
+    }
+    target.statement.whileStat.cond = exp.exp;
+    target.statement.whileStat.whileScope = statement.statement;
+    target.statement.whileStat.whileScope.code.insideWhile = false;
+}
+
+
 
 
