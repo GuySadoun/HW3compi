@@ -51,6 +51,39 @@ struct Flow{
     types retType;
 };
 
+struct Type{
+    types type;
+
+    string typeToStr() {
+        string typeStr;
+
+        switch(type) {
+            case INT:
+                typeStr = "int";
+                break;
+            case BYTE:
+                typeStr = "int";
+                break;
+            case BOOL:
+                typeStr = "bool";
+                break;
+            case STRING:
+                typeStr = "string";
+                break;
+            case ENUM:
+                typeStr = "enum";
+                break;
+            case FUNC:
+                typeStr = "func";
+                break;
+            case VOID:
+                typeStr = "void";
+                break;
+        }
+        return typeStr;
+    }
+};
+
 struct EnumType {
     string name;
     // the type of enum ID is set to be enumID
@@ -136,6 +169,8 @@ struct Call {
 
 struct Formals {
     FormalsList formalList;
+    Formals(){}
+    Formals( FormalsList list): formalList(list);
 };
 
 struct FormalDecl {
@@ -216,14 +251,25 @@ struct whileStatement {
 };
 
 struct RetType {
-    types type;
+    Type type;
 };
 
 struct FuncDecl {
-    types retType;
+    RetType retType;
     string name;
     Formals formals;
     Statements statements;
+
+    FuncDecl( RetType returnType, string name, Formals formls, Statements states, int lineno ){
+        retType = returnType;
+        name = name;
+        formals = formls;
+        statements = states;
+    }
+    string FuncDeclToStr () {
+        return output::makeFunctionType( retType.type.typeToStr(), formals.formalList.formalsToStr());
+    }
+
 };
 
 struct Enums {
@@ -251,7 +297,6 @@ typedef union {
     EnumDecl enumDecl;
     EnumType enumType;
     ExpList expList;
-    FuncDecl funcDecl;
     Funcs funcs;
     Enums enums;
     RetType retType;
@@ -260,6 +305,7 @@ typedef union {
     FormalDecl formalDecl;
     Statements statements;
     Statement statement;
+    FuncDecl funcDecl;
 } Types;
 
 extern Enums declared;

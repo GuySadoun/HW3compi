@@ -5,9 +5,9 @@
 #include "tableStack.h"
 #include <utility>
 using namespace output;
-void Table::newLine(string name, types type, int off, const Types& value) {
+void Table::newLine(string name, string type, int off, const Types& value) {
     scopeTable.insert( scopeTable.begin(),
-            new TableEntry(std::move(name), type, typeToStr(type, value), off, value));
+            new TableEntry(std::move(name), type, off, value));
 }
 
 Table::~Table() {
@@ -22,38 +22,6 @@ bool Table::existInTable(const string& name) {
     }
     return false;
 }
-
-string Table::typeToStr(types type, const Types& value) {
-
-    string typeStr;
-    switch(type) {
-        case INT:
-            typeStr = "int";
-            break;
-        case BYTE:
-            typeStr = "int";
-            break;
-        case BOOL:
-            typeStr = "bool";
-            break;
-        case STRING:
-            typeStr = "string";
-            break;
-        case ENUM:
-            typeStr = value.enumDecl.namedType;
-            break;
-        case FUNC:
-            string retVal = typeToStr( value.funcDecl.retType, value.funcDecl.statements );
-            typeStr = output::makeFunctionType( retVal, value.funcDecl.formals.formalList.formalsToStr());
-            break;
-        case VOID:
-            typeStr = "void";
-            break;
-    }
-
-    return typeStr;
-}
-
 
 void symbolTable::newScope() {
     auto it = tablesStack.begin();
@@ -72,7 +40,7 @@ void symbolTable::endScope() {
     offsetStack.endScope();
 }
 
-void symbolTable::newVar(const string& symbol, types type, Types &value, int lineNum) {
+void symbolTable::newVar(const string& symbol, string type, Types &value, int lineNum) {
     if (exist(symbol)) {
         errorDef(lineNum, symbol);
         exit(1);
@@ -105,6 +73,7 @@ void symbolTable::updateSymbolValue(const string& symbol, const Types& value, in
                             entry->val.enumDecl = value.enumDecl;
                             break;
                         case FUNC:
+                            // TODO maybe different error
                             errorSyn(lineNum);
                             break;
                         case VOID:
@@ -180,7 +149,8 @@ bool symbolTable::exist(const string& symbol) {
 
 }
 
-void symbolTable::newDecl(const string &symbol, types type, int lineNum) {
+void symbolTable::newDecl(const string &symbol, string type, int lineNum) {
+
     if (exist(symbol)){
         errorDef(lineNum, symbol);
         exit(1);

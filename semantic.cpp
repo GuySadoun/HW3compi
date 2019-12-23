@@ -200,7 +200,7 @@ void semantic::block(Types &target, Types &code) {
 }
 
 void semantic::varDecl(Types &target, types type, const string &id, int lineno) {
-    symbolTable.newDecl(id, type, lineno);
+    symbolTable.newDecl(id, typeToStr(type), lineno);
 }
 
 void semantic::enumStatement(Types &target, Types &senum) {
@@ -287,6 +287,33 @@ void semantic::typeVarDec(Types &target, Types &type, const string &str, int lin
         errorDef(lineno, str);
     }
     symbolTable.newDecl(str, type.type, lineno);
+}
+
+void semantic::formalDecl(Types &target, Types &formalDecl ){
+
+    FormalsList formalList = FormalsList( formalDecl.formalDecl );
+    target.FormalsList = formalList;
+}
+
+void formalsList( Types &target, Types &formalDecl, Types &formalList){
+    FormalsList formalsList = FormalsList( formalDecl.formalDecl, formalList.formalsList );
+    target.formalsList = formalsList;
+}
+
+void formals( Type &target){
+    //TODO not sure about the empty
+}
+
+void formals( Type &target, Types &formalsList){
+    Formals formals = Formals( formalsList.formalsList );
+    target.formals = formals;
+}
+
+void funcDecl( Type &target, string &name, Types &retType, Types &formals, Types &statements, int lineno){
+
+    FuncDecl funcDecl = FuncDecl(name, retType.retType, formals.formals, statements.statements  );
+    symbolTable.newVar( name, funcDecl.FuncDeclToStr(), funcDecl, lineno );
+    target.funcDecl = funcDecl;
 }
 
 

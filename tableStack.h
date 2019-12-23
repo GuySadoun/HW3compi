@@ -32,7 +32,7 @@ struct Table {
         int offset;
         Types &val;
 
-        TableEntry(string name, types type, string typeStr, int offset, Types &val) :
+        TableEntry(string name, string type, int offset, Types &val) :
                 name(name), type(type), typeStr(typeStr), offset(offset), val(val) {}
     };
 
@@ -63,9 +63,9 @@ public:
 
     void endScope();
 
-    void newVar(const string &name, types type, Types &value, int lineNum);
+    void newVar(const string &name, string type, Types &value, int lineNum);
 
-    void newDecl(const string &name, types type, int lineNum);
+    void newDecl(const string &name, string type, int lineNum);
 
     void updateSymbolValue(const string &name, const Types &value, int lineNum);
 

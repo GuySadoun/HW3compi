@@ -79,7 +79,8 @@ Funcs : %empty { printProductionRule(2); }
     | FuncDecl Funcs { printProductionRule(3); }
     ;
 
-FuncDecl : RetType ID LPAREN Formals RPAREN  LBRACE NewScope Statements RBRACE { printProductionRule(4); }
+FuncDecl : RetType ID LPAREN Formals RPAREN  LBRACE NewScope Statements RBRACE {
+ funcDecl($$, $1, $2, $4, $8, yylineno);}
     ;
 
 
@@ -94,12 +95,12 @@ RetType : Type { printProductionRule(8); }
     | VOID { $$.retType.type = VOID; }
     ;
 
-Formals : %empty { printProductionRule(10); }
-    | FormalsList { printProductionRule(11); }
+Formals : %empty { formals($$); }
+    | FormalsList { formals($$, $1) }
     ;
 
-FormalsList : FormalDecl { printProductionRule(12); }
-    | FormalDecl COMMA FormalsList { printProductionRule(13); }
+FormalsList : FormalDecl { formalDecl($$, $1); }
+    | FormalDecl COMMA FormalsList { formalsList( $$, $1, $3 ); }
     ;
 
 FormalDecl : Type ID { semantic::typeVarDec($$, $1, $2.str, yylineno); }
