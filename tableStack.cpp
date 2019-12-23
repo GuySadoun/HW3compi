@@ -4,7 +4,7 @@
 
 #include "tableStack.h"
 #include <utility>
-
+using namespace output;
 void Table::newLine(string name, types type, int off, Types &value) {
 
 
@@ -183,5 +183,16 @@ bool symbolTable::exist(const string& symbol) {
     }
     return exists;
 
+}
+
+void symbolTable::newDecl(const string &symbol, types type, int lineNum) {
+    for (auto table : tablesStack) {
+        if (table->existInTable(symbol)) {
+            errorDef(lineNum, symbol);
+            exit(1);
+        }
+    }
+    tablesStack.front()->newLine(symbol, type,offsetStack.getTop(), Types.type.UNDEF, lineNum);
+    offsetStack.incTop();
 }
 

@@ -17,7 +17,7 @@ using std::string;
 using std::vector;
 
 enum types {
-    INT, BYTE, BOOL, VOID, STRING, ENUM, FUNC
+    INT, BYTE, BOOL, VOID, STRING, ENUM, FUNC, UNDEF
 };
 
 enum statType {
@@ -171,12 +171,12 @@ struct FormalsList {
 
 struct Statement {
     statType statType;
+    Statements code;
     FormalDecl formalDecl;
     EnumType enumType;
     EnumDecl enumDecl;
     Expression exp;
     Call call;
-
 };
 
 struct Statements {

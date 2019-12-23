@@ -194,6 +194,16 @@ void semantic::callCreate(Types &target, const string& id, int lineno) {
     target.call = call;
 }
 
+void semantic::block(Types &target, Types &code) {
+    target.statement.code.statements = code.statements.statements;
+    symbolTable.endScope();
+}
+
+void semantic::varDecl(Types &target, types type, string &id, int lineno) {
+    symbolTable.newVar(id, type, )
+}
+
+
 
 
 

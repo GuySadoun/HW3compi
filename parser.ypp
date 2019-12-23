@@ -118,8 +118,8 @@ Statements : Statement { printProductionRule(19); }
     | Statements Statement { printProductionRule(20); }
     ;
 
-Statement : LBRACE NewScope Statements RBRACE { printProductionRule(21); }
-    | Type ID SC { printProductionRule(22); }
+Statement : LBRACE NewScope Statements RBRACE { semantic::block($$, $3, yylineno); }
+    | Type ID SC { void semantic::varDecl($$, $1, $2, yylineno); }
     | EnumType ID SC { printProductionRule(23); }
     | EnumDecl { printProductionRule(24); }
     | Type ID ASSIGN Exp SC { printProductionRule(25); }

@@ -57,5 +57,8 @@ namespace semantic {
 
     void callCreate(Types &target, const string& id, int lineno);
 
+    void block(Types &target, Types &statements);
+
+    void varDecl(Types &target, types type, string &id, int lineno);
 }
 #endif //HW3COMPI_SEMANTIC_H

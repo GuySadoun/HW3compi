@@ -51,6 +51,7 @@ public:
     void endScope();
 
     void newVar(const string& name, types type, Types & value, int lineNum);
+    void newDecl(const string& name, types type, int lineNum);
     void updateSymbolValue(const string& name, Types value);
 
     string getStringVal(const string& symbol, int lineNum);
