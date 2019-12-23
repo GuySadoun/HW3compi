@@ -4,6 +4,7 @@
 
 #ifndef HW3COMPI_TABLESTACK_H
 #define HW3COMPI_TABLESTACK_H
+
 #include "hw3_output.hpp"
 #include "offsetStack.h"
 #include "structs.h"
@@ -14,10 +15,12 @@ using std::vector;
 class TblErr : public std::exception {
 public:
     TblErr(const string msg) : m_msg(msg) {}
-    const char* what() const throw () override {
+
+    const char *what() const throw() override {
         cout << "TblErr - what:" << m_msg << endl;
         return m_msg.c_str();
     }
+
     const string m_msg;
 };
 
@@ -29,38 +32,52 @@ struct Table {
         int offset;
         Types &val;
 
-        TableEntry(string name, types type, string typeStr, int offset, Types & val) :
-                        name(name), type(type), typeStr(typeStr), offset(offset), val(val) {}
+        TableEntry(string name, types type, string typeStr, int offset, Types &val) :
+                name(name), type(type), typeStr(typeStr), offset(offset), val(val) {}
     };
-    vector<TableEntry*> scopeTable;
+
+    vector<TableEntry *> scopeTable;
+
     Table() = default;
+
     void newLine(string name, types type, int off, Types value);
-    bool existInTable(const string& name);
+
+    bool existInTable(const string &name);
+
     string typeToStr(types t);
+
     ~Table();
 };
+
 class symbolTable {
-    vector<Table*> tablesStack;
+    vector<Table *> tablesStack;
     OffsetStack offsetStack;
-    void checkTableEmpty( const string& expMessage);
+
+    void checkTableEmpty(const string &expMessage);
 
 public:
 
     symbolTable() = default;
+
     void newScope();
+
     void endScope();
 
-    void newVar(const string& name, types type, Types & value, int lineNum);
-    void newDecl(const string& name, types type, int lineNum);
-    void updateSymbolValue(const string& name, const Types& value, int lineNum);
+    void newVar(const string &name, types type, Types &value, int lineNum);
 
-    string getStringVal(const string& symbol, int lineNum);
-    int getIntegerVal(const string& symbol, int lineNum);
-    bool getBoolVal(const string& symbol, int lineNum);
-    FuncDecl getFuncVal(const string& symbol, int lineNum);
+    void newDecl(const string &name, types type, int lineNum);
 
-    bool exist(const string& symbol);
+    void updateSymbolValue(const string &name, const Types &value, int lineNum);
 
+    string getStringVal(const string &symbol, int lineNum);
+
+    int getIntegerVal(const string &symbol, int lineNum);
+
+    bool getBoolVal(const string &symbol, int lineNum);
+
+    FuncDecl getFuncVal(const string &symbol, int lineNum);
+
+    bool exist(const string &symbol);
 
 };
 

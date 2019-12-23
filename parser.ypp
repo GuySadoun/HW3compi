@@ -87,13 +87,11 @@ Enums : %empty { printProductionRule(5); }
     | EnumDecl Enums { printProductionRule(6); }
     ;
 
-EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC {
-        semantic::enumdecl($$, $2.str, $4, yylineno);
-    }
+EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { semantic::enumdecl($$, $2.str, $4, yylineno); }
     ;
 
 RetType : Type { printProductionRule(8); }
-    | VOID { currRetType = VOID }
+    | VOID { $$.retType.type = VOID; }
     ;
 
 Formals : %empty { printProductionRule(10); }
@@ -104,19 +102,19 @@ FormalsList : FormalDecl { printProductionRule(12); }
     | FormalDecl COMMA FormalsList { printProductionRule(13); }
     ;
 
-FormalDecl : Type ID { printProductionRule(14); }
-    | EnumType ID { printProductionRule(15); }
+FormalDecl : Type ID { semantic::typeVarDec($$, $1, $2.str, yylineno); }
+    | EnumType ID { semantic::enumVarDeck($$, $1, $2.str, yylineno); }
     ;
 
 EnumeratorList : Enumerator { semantic::enumeratorlist($$, $1, yylineno); }
     | EnumeratorList COMMA Enumerator { semantic::enumeratorlist($$, $1, $3, yylineno); }
     ;
 
-Enumerator : ID { printProductionRule(18); }
+Enumerator : ID { $$.enumerator = { .enumName = $1.str; }
     ;
 
-Statements : Statement { printProductionRule(19); }
-    | Statements Statement { printProductionRule(20); }
+Statements : Statement { $$.statements($1); }
+    | Statements Statement { $$.statements($1, $2); }
     ;
 
 Statement : LBRACE NewScope Statements RBRACE { semantic::block($$, $3, yylineno); }
@@ -135,27 +133,21 @@ Statement : LBRACE NewScope Statements RBRACE { semantic::block($$, $3, yylineno
     | IF LPAREN Exp RPAREN Statement %prec NO_ELSE { semantic::ifStatement($$, $3, $5, yylineno); }
     | IF LPAREN Exp RPAREN Statement ELSE Statement { semantic::ifElseStatement($$, $3, $5, $7, yylineno); }
     | WHILE MarkerWhileOn LPAREN Exp RPAREN Statement { semantic::whileStatement($$, $3.exp, $5, yylineno); }
-    | BREAK SC {
-        if ( ($$.statement.code.insideWhile == false){
-            errorUnexpectedBreak(yylineno);
-        }
-    }
-    | CONTINUE SC {
-        if ( ($$.statement.code.insideWhile == false){
-                 errorUnexpectedContinue(yylineno);
-        }
+    | BREAK SC { semantic::breakContinue($$, false, yylineno); }
+    | CONTINUE SC { semantic::breakContinue($$, true, yylineno); }
     }
     ;
-    MarkerWhileOn : %empty {
 
-        $$.statement.whileStat.statWhile.code.insideWhile = true;
-
+MarkerWhileOn : %empty {
+    $$.statement.whileStat.statWhile.code.insideWhile = true;
     }
+    ;
 
 NewScope : %empty {
                         if (!symbolTable) symbolTable = new symbolTable;
                         symbolTable->newScope();
-                   }
+    }
+    ;
 
 Call : ID LPAREN ExpList RPAREN { semantic::callCreate($$, $1.str, $3, yylineno); }
     | ID LPAREN RPAREN { semantic::callCreate($$, $1.str, yylineno); }
@@ -165,9 +157,9 @@ ExpList : Exp { semantic::expList($$, $1); }
     | Exp COMMA ExpList { semantic::expList($$, $3, $1); }
     ;
 
-Type : INT { currRetType = "int"; }
-    | BYTE { currRetType = "byte"; }
-    | BOOL { currRetType = "bool"; }
+Type : INT { $$.type = INT; }
+    | BYTE { $$.type = BYTE; }
+    | BOOL { $$.type = BOOL; }
     ;
 
 EnumType : ENUM ID { semantic::enumType($$, $2.str, yylineno); }
@@ -198,6 +190,8 @@ Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
     | Exp LHSS Exp { semantic::relop($$, $1, $3, $2.str, yylineno); }
     | LPAREN Type RPAREN Exp {  semantic::cast($$, $2, $4, yylineno); }
     ;
+
+
 %%
 
 int main()
@@ -207,7 +201,6 @@ int main()
 
 int yyerror(const char * message)
 {
-    if (yylval == 1) errorLex(yylineno);
-	else errorSyn(yylineno);
+	errorSyn(yylineno);
 	exit(1);
 }

@@ -4,10 +4,12 @@
 
 #include "tableStack.h"
 #include <utility>
+
 using namespace output;
+
 void Table::newLine(string name, types type, int off, Types value) {
-    scopeTable.insert( scopeTable.begin(),
-            new TableEntry(std::move(name), type, typeToStr(type), off, value));
+    scopeTable.insert(scopeTable.begin(),
+                      new TableEntry(std::move(name), type, typeToStr(type), off, value));
 }
 
 Table::~Table() {
@@ -16,17 +18,17 @@ Table::~Table() {
     }
 }
 
-bool Table::existInTable(const string& name) {
+bool Table::existInTable(const string &name) {
     for (auto &entry : scopeTable) {
         if (entry->name == name) return true;
     }
     return false;
 }
 
-string Table::typeToStr(types type){
+string Table::typeToStr(types type) {
 
     string typeStr;
-    switch(type) {
+    switch (type) {
         case INT:
             typeStr = "int";
             break;
@@ -55,7 +57,7 @@ string Table::typeToStr(types type){
 }
 
 
-void symbolTable::checkTableEmpty(const string& expMessage) {
+void symbolTable::checkTableEmpty(const string &expMessage) {
     if (tablesStack.empty()) {
         //TODO
     }
@@ -76,16 +78,16 @@ void symbolTable::endScope() {
     offsetStack.endScope();
 }
 
-void symbolTable::newVar(const string& symbol, types type, Types &value, int lineNum) {
+void symbolTable::newVar(const string &symbol, types type, Types &value, int lineNum) {
     if (exist(symbol)) {
         errorDef(lineNum, symbol);
         exit(1);
     }
-    tablesStack.front()->newLine(symbol, type,offsetStack.getTop(), value);
+    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value);
     offsetStack.incTop();
 }
 
-void symbolTable::updateSymbolValue(const string& symbol, const Types& value, int lineNum) {
+void symbolTable::updateSymbolValue(const string &symbol, const Types &value, int lineNum) {
     int found = 0;
     for (auto table : tablesStack) {
         if (table->existInTable(symbol)) {
@@ -124,7 +126,7 @@ void symbolTable::updateSymbolValue(const string& symbol, const Types& value, in
     }
 }
 
-string symbolTable::getStringVal(const string& symbol, int lineNum) {
+string symbolTable::getStringVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == STRING)) {
@@ -132,11 +134,11 @@ string symbolTable::getStringVal(const string& symbol, int lineNum) {
             }
         }
     }
-    output::errorUndef( lineNum, symbol );
+    output::errorUndef(lineNum, symbol);
     exit(1);
 }
 
-bool symbolTable::getBoolVal(const string& symbol, int lineNum) {
+bool symbolTable::getBoolVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == BOOL)) {
@@ -144,11 +146,11 @@ bool symbolTable::getBoolVal(const string& symbol, int lineNum) {
             }
         }
     }
-    output::errorUndef( lineNum, symbol );
+    output::errorUndef(lineNum, symbol);
     exit(1);
 }
 
-int symbolTable::getIntegerVal(const string& symbol, int lineNum) {
+int symbolTable::getIntegerVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == INT)) {
@@ -156,11 +158,11 @@ int symbolTable::getIntegerVal(const string& symbol, int lineNum) {
             }
         }
     }
-    output::errorUndef( lineNum, symbol );
+    output::errorUndef(lineNum, symbol);
     exit(1);
 }
 
-FuncDecl symbolTable::getFuncVal(const string& symbol, int lineNum) {
+FuncDecl symbolTable::getFuncVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == FUNC)) {
@@ -170,11 +172,11 @@ FuncDecl symbolTable::getFuncVal(const string& symbol, int lineNum) {
             }
         }
     }
-    output::errorUndefFunc( lineNum, symbol );
+    output::errorUndefFunc(lineNum, symbol);
     exit(1);
 }
 
-bool symbolTable::exist(const string& symbol) {
+bool symbolTable::exist(const string &symbol) {
 
     // go lifo in the vector, look for the symbol
     bool exists = false;
@@ -187,12 +189,12 @@ bool symbolTable::exist(const string& symbol) {
 }
 
 void symbolTable::newDecl(const string &symbol, types type, int lineNum) {
-    if (exist(symbol)){
+    if (exist(symbol)) {
         errorDef(lineNum, symbol);
         exit(1);
     }
     Types t;
-    tablesStack.front()->newLine(symbol, type,offsetStack.getTop(), t);
+    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), t);
     offsetStack.incTop();
 }
 

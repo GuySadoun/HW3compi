@@ -29,11 +29,11 @@ public:
 
 using std::string;
 namespace semantic {
-    void binop(Types &target, Types &a, Types &b, const string& sign, int lineno);
+    void binop(Types &target, Types &a, Types &b, const string &sign, int lineno);
 
-    void logicop(Types &target, Types &a, Types &b, const string& sign, int lineno);
+    void logicop(Types &target, Types &a, Types &b, const string &sign, int lineno);
 
-    void relop(Types &target, Types &a, Types &b, const string& sign, int lineno);
+    void relop(Types &target, Types &a, Types &b, const string &sign, int lineno);
 
     void cast(Types &target, Types &a, Types &b, int lineno);
 
@@ -53,13 +53,13 @@ namespace semantic {
 
     void expList(Types &target, Types &expList, Types &exp);
 
-    void callCreate(Types &target, const string& id, Types &expList, int lineno);
+    void callCreate(Types &target, const string &id, Types &expList, int lineno);
 
-    void callCreate(Types &target, const string& id, int lineno);
+    void callCreate(Types &target, const string &id, int lineno);
 
     void block(Types &target, Types &statements);
 
-    void varDecl(Types &target, types type, string id, int lineno);
+    void varDecl(Types &target, types type, const string &id, int lineno);
 
     void enumStatement(Types &target, Types &senum);
 
@@ -73,6 +73,12 @@ namespace semantic {
 
     void ifElseStatement(Types &target, Types &exp, Types &statement1, Types &statement2, int lineno);
 
-    void whileStatement( Types &target, Types &exp, Types &statement, int lineno  );
+    void whileStatement(Types &target, Types &exp, Types &statement, int lineno);
+
+    void enumVarDeck(Types &target, Types &enumType, const string &str, int lineno);
+
+    void typeVarDec(Types &target, Types &type, const string &str, int lineno);
+
+    void breakContinue(Types &target, bool isContinue, int lineno);
 }
 #endif //HW3COMPI_SEMANTIC_H
