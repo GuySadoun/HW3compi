@@ -31,7 +31,7 @@ using std::string;
 namespace semantic {
     void binop(Types &target, Types &a, Types &b, const string& sign, int lineno);
 
-    void logicop(Types &target, Types &a, Types &b, string sign, int lineno);
+    void logicop(Types &target, Types &a, Types &b, const string& sign, int lineno);
 
     void relop(Types &target, Types &a, Types &b, const string& sign, int lineno);
 
@@ -59,6 +59,18 @@ namespace semantic {
 
     void block(Types &target, Types &statements);
 
-    void varDecl(Types &target, types type, string &id, int lineno);
+    void varDecl(Types &target, types type, string id, int lineno);
+
+    void enumStatement(Types &target, Types &senum);
+
+    void declAndAssign(Types &target, types type, string id, Types &exp, int lineno);
+
+    void enumTypeAssign(Types &target, Types &enumType, string id, Types &exp, int lineno);
+
+    void assign(Types &target, string &id, Types &exp, int lineno);
+
+    void ifStatement(Types &target, Types &exp, Types &statement);
+
+    void ifElseStatement(Types &target, Types &exp, Types &statement1, Types &statement2);
 }
 #endif //HW3COMPI_SEMANTIC_H

@@ -87,7 +87,7 @@ Enums : %empty { printProductionRule(5); }
     ;
 
 EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC {
-        semantic::enumdecl($$, $2, $4, yylineno);
+        semantic::enumdecl($$, $2.str, $4, yylineno);
     }
     ;
 
@@ -119,17 +119,20 @@ Statements : Statement { printProductionRule(19); }
     ;
 
 Statement : LBRACE NewScope Statements RBRACE { semantic::block($$, $3, yylineno); }
-    | Type ID SC { void semantic::varDecl($$, $1, $2, yylineno); }
-    | EnumType ID SC { printProductionRule(23); }
-    | EnumDecl { printProductionRule(24); }
-    | Type ID ASSIGN Exp SC { printProductionRule(25); }
-    | EnumType ID ASSIGN Exp SC { printProductionRule(26); }
-    | ID ASSIGN Exp SC { printProductionRule(27); }
-    | Call SC { printProductionRule(28); }
-    | RETURN SC { printProductionRule(29); }
-    | RETURN Exp SC { printProductionRule(30); }
-    | IF LPAREN Exp RPAREN Statement %prec NO_ELSE { printProductionRule(31); }
-    | IF LPAREN Exp RPAREN Statement ELSE Statement { printProductionRule(32); }
+    | Type ID SC { semantic::varDecl($$, $1.str, $2, yylineno); }
+    | EnumType ID SC { semantic::varDecl($$, $1.str, $2, yylineno); }
+    | EnumDecl { semantic::enumStatement($$, $1); }
+    | Type ID ASSIGN Exp SC {  semantic::declAndAssign($$, $1.types, $2.str, $4, yylineno); }
+    | EnumType ID ASSIGN Exp SC { semantic::declAndAssign($$, $1, $2.str, $4, yylineno); }
+    | ID ASSIGN Exp SC { semantic::assign($$, $1.str, $3, yylineno); }
+    | Call SC { $$.Statment.call = $1.call; }
+    | RETURN SC { $$.statement.returnType.ret = false; }
+    | RETURN Exp SC {
+                        $$.statement.returnType.ret = true;
+                        $$.statement.returnType.retVal = $2.exp;
+                    }
+    | IF LPAREN Exp RPAREN Statement %prec NO_ELSE { semantic::ifStatement($$, $3, $5); }
+    | IF LPAREN Exp RPAREN Statement ELSE Statement { semantic::ifElseStatement($$, $3, $5, $7); }
     | WHILE LPAREN Exp RPAREN Statement { printProductionRule(33); }
     | BREAK SC { printProductionRule(34); }
     | CONTINUE SC { printProductionRule(35); }
@@ -140,8 +143,8 @@ NewScope : %empty {
                         symbolTable->newScope();
                    }
 
-Call : ID LPAREN ExpList RPAREN { semantic::callCreate($$, $1, $3, yylineno); }
-    | ID LPAREN RPAREN { semantic::callCreate($$, $1, yylineno); }
+Call : ID LPAREN ExpList RPAREN { semantic::callCreate($$, $1.str, $3, yylineno); }
+    | ID LPAREN RPAREN { semantic::callCreate($$, $1.str, yylineno); }
     ;
 
 ExpList : Exp { semantic::expList($$, $1); }
@@ -153,7 +156,7 @@ Type : INT { currRetType = "int"; }
     | BOOL { currRetType = "bool"; }
     ;
 
-EnumType : ENUM ID { semantic::enumType($$, $2, yylineno); }
+EnumType : ENUM ID { semantic::enumType($$, $2.str, yylineno); }
     ;
 
 Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;

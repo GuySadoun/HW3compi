@@ -5,9 +5,7 @@
 #include "tableStack.h"
 #include <utility>
 using namespace output;
-void Table::newLine(string name, types type, int off, Types &value) {
-
-
+void Table::newLine(string name, types type, int off, Types value) {
     scopeTable.insert( scopeTable.begin(),
             new TableEntry(std::move(name), type, typeToStr(type), off, value));
 }
@@ -79,23 +77,21 @@ void symbolTable::endScope() {
 }
 
 void symbolTable::newVar(const string& symbol, types type, Types &value, int lineNum) {
-
-    for (auto table : tablesStack) {
-        if (table->existInTable(symbol)) {
-            //TODO error
-        }
+    if (exist(symbol)) {
+        errorDef(lineNum, symbol);
+        exit(1);
     }
-    tablesStack.front()->newLine(symbol, type,  ,offsetStack.getTop(), value);
+    tablesStack.front()->newLine(symbol, type,offsetStack.getTop(), value);
     offsetStack.incTop();
 }
 
-void symbolTable::updateSymbolValue(const string& symbol, Types value) {
-
+void symbolTable::updateSymbolValue(const string& symbol, const Types& value, int lineNum) {
+    int found = 0;
     for (auto table : tablesStack) {
         if (table->existInTable(symbol)) {
+            found = 1;
             for (auto entry : table->scopeTable) {
                 if (entry->name == symbol) {
-
                     switch (entry->type) {
                         case INT:
                             entry->val.integer = value.integer;
@@ -110,8 +106,10 @@ void symbolTable::updateSymbolValue(const string& symbol, Types value) {
                             entry->val.str = value.str;
                             break;
                         case ENUM:
+                            entry->val.enumDecl = value.enumDecl;
                             break;
                         case FUNC:
+                            errorSyn(lineNum);
                             break;
                         case VOID:
                             break;
@@ -120,7 +118,10 @@ void symbolTable::updateSymbolValue(const string& symbol, Types value) {
             }
         }
     }
-    throw (TblErr("errorUndef"));
+    if (!found) {
+        errorUndef(lineNum, symbol);
+        exit(1);
+    }
 }
 
 string symbolTable::getStringVal(const string& symbol, int lineNum) {
@@ -186,13 +187,12 @@ bool symbolTable::exist(const string& symbol) {
 }
 
 void symbolTable::newDecl(const string &symbol, types type, int lineNum) {
-    for (auto table : tablesStack) {
-        if (table->existInTable(symbol)) {
-            errorDef(lineNum, symbol);
-            exit(1);
-        }
+    if (exist(symbol)){
+        errorDef(lineNum, symbol);
+        exit(1);
     }
-    tablesStack.front()->newLine(symbol, type,offsetStack.getTop(), Types.type.UNDEF, lineNum);
+    Types t;
+    tablesStack.front()->newLine(symbol, type,offsetStack.getTop(), t);
     offsetStack.incTop();
 }
 

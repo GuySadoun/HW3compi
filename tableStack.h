@@ -34,7 +34,7 @@ struct Table {
     };
     vector<TableEntry*> scopeTable;
     Table() = default;
-    void newLine(string name, types type, int off, Types & value);
+    void newLine(string name, types type, int off, Types value);
     bool existInTable(const string& name);
     string typeToStr(types t);
     ~Table();
@@ -52,7 +52,7 @@ public:
 
     void newVar(const string& name, types type, Types & value, int lineNum);
     void newDecl(const string& name, types type, int lineNum);
-    void updateSymbolValue(const string& name, Types value);
+    void updateSymbolValue(const string& name, const Types& value, int lineNum);
 
     string getStringVal(const string& symbol, int lineNum);
     int getIntegerVal(const string& symbol, int lineNum);

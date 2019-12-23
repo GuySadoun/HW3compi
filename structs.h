@@ -17,13 +17,12 @@ using std::string;
 using std::vector;
 
 enum types {
-    INT, BYTE, BOOL, VOID, STRING, ENUM, FUNC, UNDEF
+    INT, BYTE, BOOL, VOID, STRING, ENUM, FUNC
 };
 
-enum statType {
-    DECL, FLOW, LOOP, SCOPE, ASSIGN
+enum flowType {
+    BREAK, CONTINUE
 };
-
 
 struct Program;
 struct Enums;
@@ -43,10 +42,6 @@ struct ExpList;
 struct EnumType;
 struct Expression;
 struct EnumType;
-
-struct BasicDeclInfo {
-    int lineNum;
-};
 
 struct Funcs {
     vector<FuncDecl> funcDeclarations;
@@ -89,7 +84,7 @@ struct EnumeratorList {
     }
 };
 
-struct EnumDecl : BasicDeclInfo {
+struct EnumDecl {
     EnumType namedType;
     EnumeratorList values;
 
@@ -99,7 +94,7 @@ struct EnumDecl : BasicDeclInfo {
     }
 };
 
-struct Expression : BasicDeclInfo {
+struct Expression {
 
     Value val;
     string id;
@@ -130,7 +125,7 @@ struct ExpList {
     }
 };
 
-struct Call : BasicDeclInfo {
+struct Call {
     // the returned type ?
     string name;
     ExpList args;
@@ -140,11 +135,11 @@ struct Call : BasicDeclInfo {
     Call( string id): name(id){}
 };
 
-struct Formals : BasicDeclInfo {
+struct Formals {
     FormalsList formalList;
 };
 
-struct FormalDecl : BasicDeclInfo {
+struct FormalDecl {
     types type;
     EnumType enumType;
     string id;
@@ -177,6 +172,25 @@ struct Statement {
     EnumDecl enumDecl;
     Expression exp;
     Call call;
+    returnType retType;
+    ifStatement ifStat;
+    ifElseStatement ifElseStat;
+};
+
+struct returnType {
+    bool ret;
+    Expression retVal
+};
+
+struct ifStatement {
+    Expression cond;
+    Statement stat;
+};
+
+struct ifElseStatement {
+    Expression cond;
+    Statement statIf;
+    Statement statElse;
 };
 
 struct Statements {
@@ -187,7 +201,7 @@ struct RetType {
     types type;
 };
 
-struct FuncDecl : BasicDeclInfo {
+struct FuncDecl {
     types retType;
     string name;
     Formals formals;
@@ -195,9 +209,7 @@ struct FuncDecl : BasicDeclInfo {
 };
 
 struct Enums {
-    unordered_map<EnumType, EnumDecl> declaredEnums;
-
-    Enums() = default;
+    unordered_map<string, EnumDecl> declaredEnums;
 
     void addEnumerator(EnumDecl enumerator) {
         declaredEnums[enumerator.namedType] = enumerator;
