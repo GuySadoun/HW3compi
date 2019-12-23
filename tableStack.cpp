@@ -4,10 +4,11 @@
 
 #include "tableStack.h"
 #include <utility>
+
 using namespace output;
-void Table::newLine(string name, types type, int off, Types value) {
+void Table::newLine(string name, types type, int off, const Types& value) {
     scopeTable.insert( scopeTable.begin(),
-            new TableEntry(std::move(name), type, typeToStr(type), off, value));
+            new TableEntry(std::move(name), type, typeToStr(type, value), off, value));
 }
 
 Table::~Table() {
@@ -23,10 +24,10 @@ bool Table::existInTable(const string& name) {
     return false;
 }
 
-string Table::typeToStr(types type){
+string Table::typeToStr(types type, const Types& value) {
 
     string typeStr;
-    switch(type) {
+    switch (type) {
         case INT:
             typeStr = "int";
             break;
@@ -40,26 +41,20 @@ string Table::typeToStr(types type){
             typeStr = "string";
             break;
         case ENUM:
-            //TODO how to save enum custom type
-            typeStr = "enum";
+            typeStr = value.enumDecl.namedType;
             break;
         case FUNC:
-            //TODO where to get the params for makeFunctionType
-            //output::makeFunctionType( );
+            string retVal = typeToStr( value.funcDecl.retType, value.funcDecl.statements );
+            typeStr = output::makeFunctionType( retVal, value.funcDecl.formals.formalList.formalsToStr());
             break;
         case VOID:
+            typeStr = "void";
             break;
-    }
 
+    }
     return typeStr;
 }
 
-
-void symbolTable::checkTableEmpty(const string& expMessage) {
-    if (tablesStack.empty()) {
-        //TODO
-    }
-}
 
 void symbolTable::newScope() {
     auto it = tablesStack.begin();
@@ -69,7 +64,9 @@ void symbolTable::newScope() {
 
 void symbolTable::endScope() {
 
-    checkTableEmpty("end scope with empty stack exception");
+    if (tablesStack.empty()) {
+        //TODO is it possible to end scope which was not open?
+    }
 
     delete *(tablesStack.begin());
     tablesStack.erase(tablesStack.begin());
@@ -81,7 +78,7 @@ void symbolTable::newVar(const string& symbol, types type, Types &value, int lin
         errorDef(lineNum, symbol);
         exit(1);
     }
-    tablesStack.front()->newLine(symbol, type,offsetStack.getTop(), value);
+    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value);
     offsetStack.incTop();
 }
 
@@ -163,10 +160,8 @@ int symbolTable::getIntegerVal(const string& symbol, int lineNum) {
 FuncDecl symbolTable::getFuncVal(const string& symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
-            if ((entry->name == symbol) && (entry->type == FUNC)) {
-                // TODO: add FuncDecl to union types
-                return FuncDecl();
-                //return entry->val.func;
+            if (entry->name == symbol) {
+                return entry->val.funcDecl;
             }
         }
     }
@@ -192,7 +187,7 @@ void symbolTable::newDecl(const string &symbol, types type, int lineNum) {
         exit(1);
     }
     Types t;
-    tablesStack.front()->newLine(symbol, type,offsetStack.getTop(), t);
+    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), t);
     offsetStack.incTop();
 }
 
