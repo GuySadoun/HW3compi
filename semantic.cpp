@@ -289,4 +289,14 @@ void semantic::typeVarDec(Types &target, Types &type, const string &str, int lin
     symbolTable.newDecl(str, type.type, lineno);
 }
 
+void semantic::formalList(Types &target, Types &decl) {
+    FormalsList formalsList(decl.formalDecl);
+    target.formalsList = formalsList;
+}
+
+void semantic::formalList(Types &target, Types &decl, Types &list) {
+    FormalsList formalsList(decl.formalDecl, list.formalsList);
+    target.formalsList = formalsList;
+}
+
 

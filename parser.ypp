@@ -72,34 +72,34 @@
 
 %%
 
-Program : Enums Funcs { printProductionRule(1); }
+Program : Enums Funcs { }
     ;
 
-Funcs : %empty { printProductionRule(2); }
-    | FuncDecl Funcs { printProductionRule(3); }
+Funcs : %empty { }
+    | FuncDecl Funcs {  }
     ;
 
-FuncDecl : RetType ID LPAREN Formals RPAREN  LBRACE NewScope Statements RBRACE { printProductionRule(4); }
+FuncDecl : RetType ID LPAREN Formals RPAREN  LBRACE NewScope Statements RBRACE {  }
     ;
 
 
-Enums : %empty { printProductionRule(5); }
-    | EnumDecl Enums { printProductionRule(6); }
+Enums : %empty {  }
+    | EnumDecl Enums { }
     ;
 
 EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { semantic::enumdecl($$, $2.str, $4, yylineno); }
     ;
 
-RetType : Type { printProductionRule(8); }
+RetType : Type {  }
     | VOID { $$.retType.type = VOID; }
     ;
 
-Formals : %empty { printProductionRule(10); }
-    | FormalsList { printProductionRule(11); }
+Formals : %empty { }
+    | FormalsList {  }
     ;
 
-FormalsList : FormalDecl { printProductionRule(12); }
-    | FormalDecl COMMA FormalsList { printProductionRule(13); }
+FormalsList : FormalDecl { }
+    | FormalDecl COMMA FormalsList { semantic::formalList($$, $1, $3, ) }
     ;
 
 FormalDecl : Type ID { semantic::typeVarDec($$, $1, $2.str, yylineno); }
@@ -110,7 +110,7 @@ EnumeratorList : Enumerator { semantic::enumeratorlist($$, $1, yylineno); }
     | EnumeratorList COMMA Enumerator { semantic::enumeratorlist($$, $1, $3, yylineno); }
     ;
 
-Enumerator : ID { $$.enumerator = { .enumName = $1.str; }
+Enumerator : ID { $$.enumerator = { .enumName = $1.str; }; }
     ;
 
 Statements : Statement { $$.statements($1); }
@@ -138,15 +138,13 @@ Statement : LBRACE NewScope Statements RBRACE { semantic::block($$, $3, yylineno
     }
     ;
 
-MarkerWhileOn : %empty {
-    $$.statement.whileStat.statWhile.code.insideWhile = true;
-    }
+MarkerWhileOn : %empty { $$.statement.whileStat.statWhile.code.insideWhile = true; }
     ;
 
 NewScope : %empty {
                         if (!symbolTable) symbolTable = new symbolTable;
                         symbolTable->newScope();
-    }
+                  }
     ;
 
 Call : ID LPAREN ExpList RPAREN { semantic::callCreate($$, $1.str, $3, yylineno); }

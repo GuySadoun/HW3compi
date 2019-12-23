@@ -26,7 +26,6 @@ bool Table::existInTable(const string &name) {
 }
 
 string Table::typeToStr(types type) {
-
     string typeStr;
     switch (type) {
         case INT:

@@ -80,5 +80,9 @@ namespace semantic {
     void typeVarDec(Types &target, Types &type, const string &str, int lineno);
 
     void breakContinue(Types &target, bool isContinue, int lineno);
+
+    void formalList(Types &target, Types &decl);
+
+    void formalList(Types &target, Types &decl, Types &list);
 }
 #endif //HW3COMPI_SEMANTIC_H
