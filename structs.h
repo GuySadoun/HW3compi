@@ -225,20 +225,6 @@ struct Statement {
     ifElseStatement ifElseStat;
     whileStatement whileStat;
     Flow breakStatement;
-
-    Statement (const Statement& statement){
-        code = statement.code;
-        formalDecl = statement.formalDecl;
-        enumType = statement.enumType;
-        enumDecl = statement.enumDecl;
-        exp = statement.exp;
-        call = statement.call;
-        retType = statement.retType;
-        ifStat = statement.ifStat;
-        ifElseStat = statement.ifElseStat;
-        whileStat = statement.whileStat;
-        breakStatement = statement.breakStatement;
-    }
 };
 
 struct RetType {
