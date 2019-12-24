@@ -6,9 +6,10 @@
 #define HW3COMPI_SEMANTIC_H
 
 #include <string>
-#include "structs.h"
 #include "hw3_output.hpp"
 #include "tableStack.h"
+#include "structs.h"
+
 
 enum ErrorType {
     SUCCESS,

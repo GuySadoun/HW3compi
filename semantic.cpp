@@ -82,26 +82,23 @@ void semantic::logicop(Types &target, Types &a, Types &b, const string &sign, in
 void semantic::call(Types &target, Types &call, int lineno) {
     if (call.call.name == "print") {
         for (auto &arg : call.call.args->args) {
-            switch (arg.type) {
+            switch (arg.get().type) {
                 case INT:
-                    cout << arg.val.integer;
+                    cout << arg.get().val.integer;
                     break;
                 case BYTE:
-                    cout << arg.val.integer;
+                    cout << arg.get().val.integer;
                     break;
                 case BOOL:
-                    cout << arg.val.boolean;
-                    break;
-                case VOID:
+                    cout << arg.get().val.boolean;
                     break;
                 case STRING:
-                    cout << arg.val.str;
+                    cout << arg.get().val.str;
                     break;
                 case ENUM:
-                    cout << arg.val.enumType.name;
+                    cout << arg.get().val.enumType.name;
                     break;
-                case FUNC:
-                    //TODO: repair!!
+                default:
                     break;
             }
         }
@@ -173,7 +170,7 @@ void semantic::callCreate(Types &target, const string &id, Types &expList, int l
         exit(1);
     }
     for (int i = 0; i < expList.expList.args.size(); ++i) {
-        if (expList.expList.args.at(i).type != formalList.funDeclParams.at(i).type) {
+        if (expList.expList.args.at(i).get().type != formalList.funDeclParams.at(i).type) {
             errorPrototypeMismatch(lineno, id, strParams);
             exit(1);
         }
@@ -219,15 +216,12 @@ void semantic::declAndAssign(Types &target, types type, const string& id, Types 
         case BOOL:
             target.exp.val.boolean = exp.exp.val.boolean;
             break;
-        case STRING:
-            target.exp.val.str = exp.exp.val.str;
-            break;
         case ENUM:
             target.exp.val.enumType = exp.exp.val.enumType;
             break;
-        case FUNC:
-            target.exp.val.funType = exp.exp.val.funType;
-            break;
+        default:
+            string exceptionMessage("declAndAssign undefined type");
+            throw (semErr(exceptionMessage));
     }
     target.exp.type = exp.exp.type;
 }
@@ -267,7 +261,7 @@ void semantic::ifStatement(Types &target, Types &exp, Types &statement, int line
     target.statement.ifStat.cond.val.boolean = exp.exp.val.boolean;
     target.statement.ifStat.cond.type = exp.exp.type;
     target.statement.ifStat.cond.id = exp.exp.id;
-    target.statement.ifStat.stat = std::make_shared<Statement>(statement.statement);
+    target.statement.ifStat.stat = std::make_shared<std::reference_wrapper<Statement>>(statement.statement);
 }
 
 void semantic::ifElseStatement(Types &target, Types &exp, Types &statement1, Types &statement2, int lineno) {
@@ -278,8 +272,8 @@ void semantic::ifElseStatement(Types &target, Types &exp, Types &statement1, Typ
     target.statement.ifElseStat.cond.val.boolean = exp.exp.val.boolean;
     target.statement.ifElseStat.cond.type = exp.exp.type;
     target.statement.ifElseStat.cond.id = exp.exp.id;
-    target.statement.ifElseStat.statIf = std::make_shared<Statement>(statement1.statement);
-    target.statement.ifElseStat.statElse = std::make_shared<Statement>(statement2.statement);
+    target.statement.ifElseStat.statIf = std::make_shared<std::reference_wrapper<Statement>>(statement1.statement);
+    target.statement.ifElseStat.statElse = std::make_shared<std::reference_wrapper<Statement>>(statement2.statement);
 }
 
 void semantic::whileStatement(Types &target, Types &exp, Types &statement, int lineno) {
@@ -291,14 +285,14 @@ void semantic::whileStatement(Types &target, Types &exp, Types &statement, int l
     target.statement.whileStat.cond.val.boolean = exp.exp.val.boolean;
     target.statement.whileStat.cond.id = exp.exp.id;
     target.statement.whileStat.cond.type = exp.exp.type;
-    target.statement.whileStat.whileScope = std::make_shared<Statement>(statement.statement);
+    target.statement.whileStat.whileScope = std::make_shared<std::reference_wrapper<Statement>>(statement.statement);
     insideWhile = true;
 }
 
 void semantic::breakContinue(Types &target, bool isContinue, int lineno) {
     if (!insideWhile && !isContinue) errorUnexpectedBreak(lineno);
     else if (!insideWhile && isContinue) errorUnexpectedContinue(lineno);
-    target.statement.breakStatement = {.line = lineno, .isContinue = isContinue};
+    target.statement.breakStatement = { .isContinue = isContinue, .line = lineno };
 }
 
 void semantic::enumVarDeck(Types &target, Types &enumType, const string &str, int lineno) {

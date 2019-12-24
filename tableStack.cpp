@@ -3,20 +3,30 @@
 //
 
 #include "tableStack.h"
-#include <utility>
+Enums declared;
+class symbolTable symbolTable;
+bool insideWhile;
 
 using namespace output;
 
-void Table::newLine(const string &name, types type, int off, Types &value) {
+void Table::newLine(const string &name, types type, int off, int value) {
     scopeTable.insert(scopeTable.begin(),
-                      new TableEntry(name, type, typeToStr(type), off, value));
+                      new TableEntry(name, type, symbolTable::typeToStr(type), off, value));
 }
 
-void Table::newLineForEnum(const string &name, int off, Types &value) {
-    string typeName = "enum " + name;
-    shared_ptr<Types> valPtr = std::make_shared<Types>(value);
+void Table::newLine(const string &name, types type, int off, bool value) {
     scopeTable.insert(scopeTable.begin(),
-                      new TableEntry(typeName, ENUM, typeToStr(ENUM), off, value));
+                      new TableEntry(name, type, symbolTable::typeToStr(type), off, value));
+}
+
+void Table::newLine(const string &name, types type, int off, const EnumType& value) {
+    scopeTable.insert(scopeTable.begin(),
+                      new TableEntry(value.name, type, symbolTable::typeToStr(ENUM), off, value));
+}
+
+void Table::newLine(const string &name, types type, int off) {
+    scopeTable.insert(scopeTable.begin(),
+                      new TableEntry(name, type, symbolTable::typeToStr(ENUM), off));
 }
 
 void Table::newLineForFunc(const string &name,  int off, FuncDecl& value) {
@@ -37,7 +47,6 @@ bool Table::existInTable(const string &name) {
     }
     return false;
 }
-
 
 void symbolTable::checkTableEmpty(const string &expMessage) {
     if (tablesStack.empty()) {
@@ -65,7 +74,22 @@ void symbolTable::newVar(const string &symbol, types type, Types &value, int lin
         errorDef(lineNum, symbol);
         exit(1);
     }
-    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value);
+    switch (type) {
+        case INT:
+            tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value.integer);
+            break;
+        case BYTE:
+            tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value.integer);
+            break;
+        case BOOL:
+            tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value.boolean);
+            break;
+        case ENUM:
+            tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), value.enumType);
+            break;
+        default:
+            break;
+    }
     offsetStack.incTop();
 }
 
@@ -169,7 +193,6 @@ bool symbolTable::exist(const string &symbol) {
             exists = true;
     }
     return exists;
-
 }
 
 void symbolTable::newDecl(const string &symbol, types type, int lineNum) {
@@ -177,12 +200,7 @@ void symbolTable::newDecl(const string &symbol, types type, int lineNum) {
         errorDef(lineNum, symbol);
         exit(1);
     }
-    Types t;
-    if (type != ENUM ) {
-        tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), t);
-    } else {
-        tablesStack.front()->newLineForEnum(symbol, offsetStack.getTop(), t);
-    }
+    tablesStack.front()->newLine(symbol, type, offsetStack.getTop());
     offsetStack.incTop();
 }
 
@@ -194,3 +212,31 @@ void symbolTable::newFuncDecl(const string &name, FuncDecl& funcDecl, int lineNu
     tablesStack.front()->newLineForFunc(name, offsetStack.getTop(), funcDecl);
 }
 
+string symbolTable::typeToStr(types type) {
+    string typeStr;
+    switch (type) {
+        case INT:
+            typeStr = "int";
+            break;
+        case BYTE:
+            typeStr = "byte";
+            break;
+        case BOOL:
+            typeStr = "bool";
+            break;
+        case STRING:
+            typeStr = "string";
+            break;
+        case ENUM:
+            //TODO how to save enum custom type
+            typeStr = "enum";
+            break;
+        case FUNC:
+            //TODO where to get the params for makeFunctionType
+            //output::makeFunctionType( );
+            break;
+        case VOID:
+            break;
+    }
+    return typeStr;
+}

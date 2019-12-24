@@ -1,9 +1,6 @@
 %{
 	#include <iostream>
 	#include <stdlib.h>
-    #include "output.hpp"
-    #include "structs.h"
-    #include "tableStack.h"
     #include "semantic.h"
 	using namespace std;
 	using namespace output;

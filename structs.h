@@ -51,41 +51,17 @@ enum types {
     FUNC
 };
 
-string typeToStr(types type) {
-    string typeStr;
-    switch (type) {
-        case INT:
-            typeStr = "int";
-            break;
-        case BYTE:
-            typeStr = "int";
-            break;
-        case BOOL:
-            typeStr = "bool";
-            break;
-        case STRING:
-            typeStr = "string";
-            break;
-        case ENUM:
-            //TODO how to save enum custom type
-            typeStr = "enum";
-            break;
-        case FUNC:
-            //TODO where to get the params for makeFunctionType
-            //output::makeFunctionType( );
-            break;
-        case VOID:
-            break;
-    }
+string typeToStr(types type);
 
-    return typeStr;
-}
 
 struct EnumType {
     string name;
     // the type of enum ID is set to be enumID
     explicit EnumType(const string id) {
         name = "enum " + id;
+    }
+    EnumType() {
+        name = "";
     }
 };
 
@@ -96,12 +72,16 @@ struct Enumerator {
 struct EnumeratorList {
     vector<Enumerator> values;
 
-    explicit EnumeratorList(Enumerator e) {
+    explicit EnumeratorList(const Enumerator& e) {
         this->values.push_back(e);
     }
 
-    EnumeratorList(const EnumeratorList& elist, Enumerator e) : values(elist.values) {
+    EnumeratorList(const EnumeratorList& elist, const Enumerator& e) : values(elist.values) {
         this->values.push_back(e);
+    }
+
+    EnumeratorList() {
+        values = vector<Enumerator>();
     }
 };
 
@@ -109,6 +89,7 @@ struct EnumDecl {
     EnumType namedType;
     EnumeratorList values;
 
+    EnumDecl() {}
     EnumDecl(string name, EnumeratorList vals) : namedType(EnumType(std::move(name))), values(std::move(vals)) {}
 };
 
@@ -150,16 +131,16 @@ struct Expression {
 };
 
 struct ExpList {
-    vector<Expression> args;
+    vector<std::reference_wrapper<Expression>> args;
 
     ExpList() {
-        args = vector<Expression>();
+        args = vector<std::reference_wrapper<Expression>>();
     }
-    ExpList(ExpList expList, Expression &exp) : args(expList.args) {
-        this->args.push_back(exp);
+    ExpList(const ExpList& expList, Expression &exp) : args(expList.args) {
+        this->args.emplace_back(exp);
     }
-    ExpList(Expression exp) {
-        this->args.push_back(exp);
+    explicit ExpList(Expression exp) {
+        this->args.emplace_back(exp);
     }
 };
 
@@ -187,7 +168,6 @@ struct FormalsList {
         }
         return ret;
     }
-
 };
 
 struct Formals {
@@ -214,18 +194,18 @@ struct returnExp {
 
 struct ifStatement {
     Expression cond;
-    std::shared_ptr<Statement> stat;
+    std::shared_ptr<std::reference_wrapper<Statement>> stat;
 };
 
 struct ifElseStatement {
     Expression cond;
-    std::shared_ptr<Statement> statIf;
-    std::shared_ptr<Statement> statElse;
+    std::shared_ptr<std::reference_wrapper<Statement>> statIf;
+    std::shared_ptr<std::reference_wrapper<Statement>> statElse;
 };
 
 struct whileStatement {
     Expression cond;
-    std::shared_ptr<Statement> whileScope;
+    std::shared_ptr<std::reference_wrapper<Statement>> whileScope;
 };
 
 struct Flow {

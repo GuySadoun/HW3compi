@@ -13,18 +13,6 @@
 
 using std::vector;
 
-class TblErr : public std::exception {
-public:
-    TblErr(const string msg) : m_msg(msg) {}
-
-    const char *what() const throw() override {
-        cout << "TblErr - what:" << m_msg << endl;
-        return m_msg.c_str();
-    }
-
-    const string m_msg;
-};
-
 struct Table {
     struct TableEntry {
         string name;
@@ -33,22 +21,42 @@ struct Table {
         int offset;
         shared_ptr<Types> val;
 
-        TableEntry(string name, types type, string typeStr, int offset, shared_ptr<Types> val) :
-                name(std::move(name)), type(type), typeStr(std::move(typeStr)), offset(offset), val(std::move(val)) {}
-
         TableEntry(string name, types type, string typeStr, int offset, const FuncDecl& val) :
                 name(std::move(name)), type(type), typeStr(std::move(typeStr)), offset(offset) {
             this->val->funcDecl = val;
         }
+
+        TableEntry(string name, types type, string typeStr, int offset, int val) :
+                name(std::move(name)), type(type), typeStr(std::move(typeStr)), offset(offset) {
+            this->val->integer = val;
+        }
+
+        TableEntry(string name, types type, string typeStr, int offset, bool val) :
+                name(std::move(name)), type(type), typeStr(std::move(typeStr)), offset(offset) {
+            this->val->boolean = val;
+        }
+
+        TableEntry(string name, types type, string typeStr, int offset, EnumType val) :
+                name(std::move(name)), type(type), typeStr(std::move(typeStr)), offset(offset) {
+            this->val->enumType = std::move(val);
+        }
+
+        TableEntry(string name, types type, string typeStr, int offset) :
+                name(std::move(name)), type(type), typeStr(std::move(typeStr)), offset(offset) {}
+
     };
 
     vector<TableEntry *> scopeTable;
 
     Table() = default;
 
-    void newLine(const string &name, types type, int off, Types &value);
+    void newLine(const string &name, types type, int off, int value);
 
-    void newLineForEnum(const string &name, int off, Types &value);
+    void newLine(const string &name, types type, int off, bool value);
+
+    void newLine(const string &name, types type, int off, const EnumType& value);
+
+    void newLine(const string &name, types type, int off);
 
     void newLineForFunc(const string &name, int off, FuncDecl& value);
 
@@ -88,10 +96,10 @@ public:
     FuncDecl getFuncVal(const string &symbol, int lineNum);
 
     bool exist(const string &symbol);
-};
 
+    static string typeToStr(types type);
+};
 extern Enums declared;
 extern symbolTable symbolTable;
 extern bool insideWhile;
-
 #endif //HW3COMPI_TABLESTACK_H
