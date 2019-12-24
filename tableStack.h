@@ -8,6 +8,7 @@
 #include "hw3_output.hpp"
 #include "offsetStack.h"
 #include "structs.h"
+#include <utility>
 #include <vector>
 
 using std::vector;
@@ -30,21 +31,28 @@ struct Table {
         string typeStr;
         types type;
         int offset;
-        Types &val;
+        shared_ptr<Types> val;
 
-        TableEntry(string name, string type, int offset, Types &val) :
-                name(name), type(type), typeStr(typeStr), offset(offset), val(val) {}
+        TableEntry(string name, types type, string typeStr, int offset, shared_ptr<Types> val) :
+                name(std::move(name)), type(type), typeStr(std::move(typeStr)), offset(offset), val(std::move(val)) {}
+
+        TableEntry(string name, types type, string typeStr, int offset, const FuncDecl& val) :
+                name(std::move(name)), type(type), typeStr(std::move(typeStr)), offset(offset) {
+            this->val->funcDecl = val;
+        }
     };
 
     vector<TableEntry *> scopeTable;
 
     Table() = default;
 
-    void newLine(string name, types type, int off, Types value);
+    void newLine(const string &name, types type, int off, Types &value);
+
+    void newLineForEnum(const string &name, int off, Types &value);
+
+    void newLineForFunc(const string &name, int off, FuncDecl& value);
 
     bool existInTable(const string &name);
-
-    string typeToStr(types t);
 
     ~Table();
 };
@@ -63,22 +71,27 @@ public:
 
     void endScope();
 
-    void newVar(const string &name, string type, Types &value, int lineNum);
+    void newVar(const string &name, types type, Types &value, int lineNum);
 
-    void newDecl(const string &name, string type, int lineNum);
+    void newDecl(const string &name, types type, int lineNum);
+
+    void newFuncDecl(const string &name, FuncDecl& funcDecl, int lineNum);
 
     void updateSymbolValue(const string &name, const Types &value, int lineNum);
 
     string getStringVal(const string &symbol, int lineNum);
 
-    int getIntegerVal(const string &symbol, int lineNum);
+    int getEnumIntegerVal(const string &symbol, int lineNum);
 
     bool getBoolVal(const string &symbol, int lineNum);
 
     FuncDecl getFuncVal(const string &symbol, int lineNum);
 
     bool exist(const string &symbol);
-
 };
+
+extern Enums declared;
+extern symbolTable symbolTable;
+extern bool insideWhile;
 
 #endif //HW3COMPI_TABLESTACK_H

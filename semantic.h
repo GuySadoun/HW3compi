@@ -8,6 +8,7 @@
 #include <string>
 #include "structs.h"
 #include "hw3_output.hpp"
+#include "tableStack.h"
 
 enum ErrorType {
     SUCCESS,
@@ -63,9 +64,9 @@ namespace semantic {
 
     void enumStatement(Types &target, Types &senum);
 
-    void declAndAssign(Types &target, types type, string id, Types &exp, int lineno);
+    void declAndAssign(Types &target, types type, const string& id, Types &exp, int lineno);
 
-    void enumTypeAssign(Types &target, Types &enumType, string id, Types &exp, int lineno);
+    void enumTypeAssign(Types &target, Types &enumType, const string& id, Types &exp, int lineno);
 
     void assign(Types &target, string &id, Types &exp, int lineno);
 
@@ -84,5 +85,15 @@ namespace semantic {
     void formalList(Types &target, Types &decl);
 
     void formalList(Types &target, Types &decl, Types &list);
+
+    void formals(Types &target, Types &formalsList);
+
+    void funcDecl(Types &target, string &name, Types &retType, Types &formals, Types &statements, int lineno);
+
+    void enumDeclToEnums(Types &target, Types &enums, Types &enumDecl);
+
+    void checkMain();
+
+    void program(Types &target, Types &enums, Types &funcs);
 }
 #endif //HW3COMPI_SEMANTIC_H
