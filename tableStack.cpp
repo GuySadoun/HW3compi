@@ -4,10 +4,12 @@
 
 #include "tableStack.h"
 #include <utility>
+
 using namespace output;
-void Table::newLine(string name, string type, int off, const Types& value) {
-    scopeTable.insert( scopeTable.begin(),
-            new TableEntry(std::move(name), type, off, value));
+
+void Table::newLine(string name, types type, int off, Types value) {
+    scopeTable.insert(scopeTable.begin(),
+                      new TableEntry(std::move(name), type, typeToStr(type), off, value));
 }
 
 Table::~Table() {
@@ -16,7 +18,7 @@ Table::~Table() {
     }
 }
 
-bool Table::existInTable(const string& name) {
+bool Table::existInTable(const string &name) {
     for (auto &entry : scopeTable) {
         if (entry->name == name) return true;
     }
@@ -89,7 +91,7 @@ void symbolTable::updateSymbolValue(const string& symbol, const Types& value, in
     }
 }
 
-string symbolTable::getStringVal(const string& symbol, int lineNum) {
+string symbolTable::getStringVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == STRING)) {
@@ -101,7 +103,7 @@ string symbolTable::getStringVal(const string& symbol, int lineNum) {
     exit(1);
 }
 
-bool symbolTable::getBoolVal(const string& symbol, int lineNum) {
+bool symbolTable::getBoolVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == BOOL)) {
@@ -113,7 +115,7 @@ bool symbolTable::getBoolVal(const string& symbol, int lineNum) {
     exit(1);
 }
 
-int symbolTable::getIntegerVal(const string& symbol, int lineNum) {
+int symbolTable::getIntegerVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == INT)) {
@@ -125,7 +127,7 @@ int symbolTable::getIntegerVal(const string& symbol, int lineNum) {
     exit(1);
 }
 
-FuncDecl symbolTable::getFuncVal(const string& symbol, int lineNum) {
+FuncDecl symbolTable::getFuncVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if (entry->name == symbol) {
@@ -137,7 +139,7 @@ FuncDecl symbolTable::getFuncVal(const string& symbol, int lineNum) {
     exit(1);
 }
 
-bool symbolTable::exist(const string& symbol) {
+bool symbolTable::exist(const string &symbol) {
 
     // go lifo in the vector, look for the symbol
     bool exists = false;
@@ -149,9 +151,8 @@ bool symbolTable::exist(const string& symbol) {
 
 }
 
-void symbolTable::newDecl(const string &symbol, string type, int lineNum) {
-
-    if (exist(symbol)){
+void symbolTable::newDecl(const string &symbol, types type, int lineNum) {
+    if (exist(symbol)) {
         errorDef(lineNum, symbol);
         exit(1);
     }

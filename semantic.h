@@ -81,14 +81,8 @@ namespace semantic {
 
     void breakContinue(Types &target, bool isContinue, int lineno);
 
-    void formalDecl(Types &target, Types &formalDecl);
+    void formalList(Types &target, Types &decl);
 
-    void formalsList( Types &target, Types &formalDecl, Types &formalList);
-
-    void formals( Type &target);
-
-    void formals( Type &target, Types &formalsList);
-
-    void funcDecl( Type &target, string &name, Types &formals, Types &statements, int lineno);
+    void formalList(Types &target, Types &decl, Types &list);
 }
 #endif //HW3COMPI_SEMANTIC_H
