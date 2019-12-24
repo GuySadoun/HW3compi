@@ -26,8 +26,8 @@ namespace output{
     void errorPrototypeMismatch(int lineno, const string& id, vector<string>& argTypes);
     void errorUnexpectedBreak(int lineno);
     void errorUnexpectedContinue(int lineno);
-    void errorMainMissing();
     void errorByteTooLarge(int lineno, const string& value);
+    void errorMainMissing();
 }
 
 #endif

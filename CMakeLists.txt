@@ -31,4 +31,4 @@ add_executable(fb1-5
         ${BisonOutput}
         ${FlexOutput}
         )
-add_executable(HW3compi parser.ypp scanner.lex main.cpp hw3_output.hpp hw3_output.cpp semantic.h semantic.cpp offsetStack.h tableStack.cpp offsetStack.cpp structs.h tableStack.h)
+add_executable(HW3compi parser.ypp scanner.lex main.cpp structs.h hw3_output.hpp hw3_output.cpp semantic.h semantic.cpp offsetStack.h tableStack.cpp offsetStack.cpp tableStack.h)

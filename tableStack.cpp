@@ -7,9 +7,22 @@
 
 using namespace output;
 
-void Table::newLine(string name, types type, int off, Types value) {
+void Table::newLine(const string &name, types type, int off, Types &value) {
     scopeTable.insert(scopeTable.begin(),
-                      new TableEntry(std::move(name), type, typeToStr(type), off, value));
+                      new TableEntry(name, type, typeToStr(type), off, value));
+}
+
+void Table::newLineForEnum(const string &name, int off, Types &value) {
+    string typeName = "enum " + name;
+    shared_ptr<Types> valPtr = std::make_shared<Types>(value);
+    scopeTable.insert(scopeTable.begin(),
+                      new TableEntry(typeName, ENUM, typeToStr(ENUM), off, value));
+}
+
+void Table::newLineForFunc(const string &name,  int off, FuncDecl& value) {
+    string typeName = value.toStr();
+    scopeTable.insert(scopeTable.begin(),
+                      new TableEntry(name, FUNC, typeName, off, value));
 }
 
 Table::~Table() {
@@ -23,36 +36,6 @@ bool Table::existInTable(const string &name) {
         if (entry->name == name) return true;
     }
     return false;
-}
-
-string Table::typeToStr(types type) {
-    string typeStr;
-    switch (type) {
-        case INT:
-            typeStr = "int";
-            break;
-        case BYTE:
-            typeStr = "int";
-            break;
-        case BOOL:
-            typeStr = "bool";
-            break;
-        case STRING:
-            typeStr = "string";
-            break;
-        case ENUM:
-            //TODO how to save enum custom type
-            typeStr = "enum";
-            break;
-        case FUNC:
-            //TODO where to get the params for makeFunctionType
-            //output::makeFunctionType( );
-            break;
-        case VOID:
-            break;
-    }
-
-    return typeStr;
 }
 
 
@@ -95,19 +78,19 @@ void symbolTable::updateSymbolValue(const string &symbol, const Types &value, in
                 if (entry->name == symbol) {
                     switch (entry->type) {
                         case INT:
-                            entry->val.integer = value.integer;
+                            entry->val->integer = value.integer;
                             break;
                         case BYTE:
-                            entry->val.integer = value.integer;
+                            entry->val->integer = value.integer;
                             break;
                         case BOOL:
-                            entry->val.boolean = value.boolean;
+                            entry->val->boolean = value.boolean;
                             break;
                         case STRING:
-                            entry->val.str = value.str;
+                            entry->val->str = value.str;
                             break;
                         case ENUM:
-                            entry->val.enumDecl = value.enumDecl;
+                            entry->val->enumDecl = value.enumDecl;
                             break;
                         case FUNC:
                             errorSyn(lineNum);
@@ -129,7 +112,7 @@ string symbolTable::getStringVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == STRING)) {
-                return entry->val.str;
+                return entry->val->str;
             }
         }
     }
@@ -141,7 +124,7 @@ bool symbolTable::getBoolVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
             if ((entry->name == symbol) && (entry->type == BOOL)) {
-                return entry->val.boolean;
+                return entry->val->boolean;
             }
         }
     }
@@ -149,11 +132,15 @@ bool symbolTable::getBoolVal(const string &symbol, int lineNum) {
     exit(1);
 }
 
-int symbolTable::getIntegerVal(const string &symbol, int lineNum) {
+int symbolTable::getEnumIntegerVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
-            if ((entry->name == symbol) && (entry->type == INT)) {
-                return entry->val.integer;
+            if ((entry->name == symbol)) {
+                for (int i = 0; i < entry->val->enumDecl.values.values.size(); ++i) {
+                    if (entry->val->enumDecl.values.values.at(i).enumName == symbol) {
+                        return i;
+                    }
+                }
             }
         }
     }
@@ -164,10 +151,8 @@ int symbolTable::getIntegerVal(const string &symbol, int lineNum) {
 FuncDecl symbolTable::getFuncVal(const string &symbol, int lineNum) {
     for (auto table : tablesStack) {
         for (auto entry : table->scopeTable) {
-            if ((entry->name == symbol) && (entry->type == FUNC)) {
-                // TODO: add FuncDecl to union types
-                return FuncDecl();
-                //return entry->val.func;
+            if ((entry->name == symbol)) {
+                return entry->val->funcDecl;
             }
         }
     }
@@ -193,7 +178,19 @@ void symbolTable::newDecl(const string &symbol, types type, int lineNum) {
         exit(1);
     }
     Types t;
-    tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), t);
+    if (type != ENUM ) {
+        tablesStack.front()->newLine(symbol, type, offsetStack.getTop(), t);
+    } else {
+        tablesStack.front()->newLineForEnum(symbol, offsetStack.getTop(), t);
+    }
     offsetStack.incTop();
+}
+
+void symbolTable::newFuncDecl(const string &name, FuncDecl& funcDecl, int lineNum) {
+    if (exist(name)) {
+        errorDef(lineNum, name);
+        exit(1);
+    }
+    tablesStack.front()->newLineForFunc(name, offsetStack.getTop(), funcDecl);
 }
 

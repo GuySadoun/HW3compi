@@ -72,33 +72,38 @@
 
 %%
 
-Program : Enums Funcs { }
+Program : init Enums Funcs {
+                          semantic::checkMain();
+                          semantic::program($$, $1, $2);
+                      }
     ;
 
-Funcs : %empty { }
-    | FuncDecl Funcs {  }
+init :  %empty { insideWhile = false; }
+
+Funcs : %empty { $$.funcs = Funcs(); }
+    | FuncDecl Funcs { $$.funcs = Funcs($1, $2); }
     ;
 
-FuncDecl : RetType ID LPAREN Formals RPAREN  LBRACE NewScope Statements RBRACE {  }
+FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE NewScope Statements RBRACE { semantic::funcDecl($$, $2.str, $1, $4, $8, int lineno); }
     ;
 
 
-Enums : %empty {  }
-    | EnumDecl Enums { }
+Enums : %empty { $$.enums = Enums(); }
+    | EnumDecl Enums { semantic::enumDeclToEnums($$, $2, $1); }
     ;
 
 EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { semantic::enumdecl($$, $2.str, $4, yylineno); }
     ;
 
-RetType : Type {  }
+RetType : Type { $$.retType.type = $1.type; }
     | VOID { $$.retType.type = VOID; }
     ;
 
-Formals : %empty { }
-    | FormalsList {  }
+Formals : %empty { $$.formals = Formals(); }
+    | FormalsList {  semantic::formals($$, $1); }
     ;
 
-FormalsList : FormalDecl { }
+FormalsList : FormalDecl { semantic::formalList($$, $1); }
     | FormalDecl COMMA FormalsList { semantic::formalList($$, $1, $3, ) }
     ;
 
@@ -171,12 +176,12 @@ Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
     | ID { $$.Exp.id = $1.str;
            $$.Exp.type = STRING; }
     | Call { semantic::call($$, $1, yylineno); }
-    | NUM { $$.Exp.val = yylval.value;
+    | NUM { $$.Exp.val.integer = yylval.value;
             $$.Exp.type = INT; }
     | NUM B { semantic::bytecheck($$, $1, yylineno); }
-    | STRING { $$.Exp.val = yylval.str;
+    | STRING { $$.Exp.val.str = yylval.str;
                $$.Exp.type = STRING;  }
-    | TRUE { $$.Exp.val = yylval.value;
+    | TRUE { $$.Exp.val.boolean = yylval.value;
              $$.Exp.type = BOOL;  }
     | FALSE { $$.Exp.val = yylval.value;
               $$.Exp.type = BOOL; }

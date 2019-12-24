@@ -10,46 +10,76 @@
 #include <vector>
 #include <unordered_map>
 #include <iostream>
-#include "tableStack.h"
+#include <memory>
+#include "hw3_output.hpp"
 
 using std::unordered_map;
 using std::string;
 using std::vector;
 
-enum types {
-    INT, BYTE, BOOL, VOID, STRING, ENUM, FUNC
-};
-
-enum flowType {
-    BREAK, CONTINUE
-};
-
-struct Program;
-struct Enums;
-struct Funcs;
-struct FuncDecl;
-struct EnumDecl;
-struct RetType;
-struct Formals;
-struct FormalsList;
-struct FormalDecl;
-struct EnumeratorList;
+struct Flow;
+struct EnumType;
 struct Enumerator;
-struct Statements;
-struct Statement;
-struct Call;
+struct EnumeratorList;
+struct EnumDecl;
 struct ExpList;
-struct EnumType;
+struct Call;
 struct Expression;
-struct EnumType;
+struct Formals;
+struct FormalDecl;
+struct FormalsList;
+struct Statement;
+struct Statements;
+struct returnExp;
+struct ifStatement;
+struct ifElseStatement;
+struct whileStatement;
+struct RetType;
+struct FuncDecl;
+struct Funcs;
+struct Enums;
+struct Program;
 
-struct Funcs {
-    vector<FuncDecl> funcDeclarations;
+
+enum types {
+    INT,
+    BYTE,
+    BOOL,
+    VOID,
+    STRING,
+    ENUM,
+    FUNC
 };
 
-struct Flow{
-    types retType;
-};
+string typeToStr(types type) {
+    string typeStr;
+    switch (type) {
+        case INT:
+            typeStr = "int";
+            break;
+        case BYTE:
+            typeStr = "int";
+            break;
+        case BOOL:
+            typeStr = "bool";
+            break;
+        case STRING:
+            typeStr = "string";
+            break;
+        case ENUM:
+            //TODO how to save enum custom type
+            typeStr = "enum";
+            break;
+        case FUNC:
+            //TODO where to get the params for makeFunctionType
+            //output::makeFunctionType( );
+            break;
+        case VOID:
+            break;
+    }
+
+    return typeStr;
+}
 
 struct EnumType {
     string name;
@@ -59,27 +89,19 @@ struct EnumType {
     }
 };
 
-typedef union {
-    string str;
-    int integer;
-    bool boolean;
-    EnumType enumType;
-    Call funType;
-} Value;
-
 struct Enumerator {
     string enumName;
 };
 
 struct EnumeratorList {
-    unordered_map<string, Enumerator> values;
+    vector<Enumerator> values;
 
-    EnumeratorList(Enumerator e) {
-        this->values[e.enumName] = e;
+    explicit EnumeratorList(Enumerator e) {
+        this->values.push_back(e);
     }
 
-    EnumeratorList(EnumeratorList elist, Enumerator e) : values(elist.values) {
-        this->values[e.enumName] = e;
+    EnumeratorList(const EnumeratorList& elist, Enumerator e) : values(elist.values) {
+        this->values.push_back(e);
     }
 };
 
@@ -87,11 +109,25 @@ struct EnumDecl {
     EnumType namedType;
     EnumeratorList values;
 
-    EnumDecl(string name, EnumeratorList vals) {
-        namedType = EnumType(name);
-        values = vals;
-    }
+    EnumDecl(string name, EnumeratorList vals) : namedType(EnumType(std::move(name))), values(std::move(vals)) {}
 };
+
+struct Call {
+    string name;
+    std::shared_ptr<ExpList> args;
+    types returnType;
+
+    Call(string id, std::shared_ptr<ExpList> expList) : args(std::move(expList)), name(std::move(id)) {}
+    Call(string id) : name(std::move(id)){}
+};
+
+typedef union {
+    string str;
+    int integer;
+    bool boolean;
+    EnumType enumType;
+    Call funType;
+} Value;
 
 struct Expression {
 
@@ -116,26 +152,15 @@ struct Expression {
 struct ExpList {
     vector<Expression> args;
 
-    ExpList(ExpList expList, Expression exp) : args(expList.args) {
+    ExpList() {
+        args = vector<Expression>();
+    }
+    ExpList(ExpList expList, Expression &exp) : args(expList.args) {
         this->args.push_back(exp);
     }
     ExpList(Expression exp) {
         this->args.push_back(exp);
     }
-};
-
-struct Call {
-    // the returned type ?
-    string name;
-    ExpList args;
-    types returnType;
-
-    Call( string id, ExpList expList) : args(expList), name(id) {}
-    Call( string id): name(id){}
-};
-
-struct Formals {
-    FormalsList formalList;
 };
 
 struct FormalDecl {
@@ -147,46 +172,60 @@ struct FormalDecl {
 struct FormalsList {
     vector<FormalDecl> funDeclParams;
 
-    FormalsList( FormalDecl formalDecl, FormalsList list) : funDeclParams(list.funDeclParams ) {
+    FormalsList( const FormalDecl& formalDecl, const FormalsList& list) : funDeclParams(list.funDeclParams ) {
         this->funDeclParams.push_back(formalDecl);
     }
-    FormalsList( FormalDecl formalDecl ){
+
+    explicit FormalsList(const FormalDecl& formalDecl){
         this->funDeclParams.push_back(formalDecl);
     }
 
     vector<string> formalsToStr() {
         vector<string> ret;
-        for ( auto formalDecl : funDeclParams ) {
-            ret.insert( ret.begin(), formalDecl.type );
+        for (const auto& formalDecl : funDeclParams) {
+            ret.insert(ret.begin(), typeToStr(formalDecl.type));
         }
         return ret;
     }
+
 };
 
-struct Statement {
-    statType statType;
-    Statements code;
-    FormalDecl formalDecl;
-    EnumType enumType;
-    EnumDecl enumDecl;
-    Expression exp;
-    Call call;
-    returnType retType;
-    ifStatement ifStat;
-    ifElseStatement ifElseStat;
-    whileStatement whileStat;
-    Flow breakStatement;
+struct Formals {
+    FormalsList formalList;
+
+    explicit Formals(FormalsList &fl) : formalList(FormalsList(fl)) {}
 };
 
 struct Statements {
-    vector<Statement> statements;
-    Statements(Statement s) {
+    vector<std::shared_ptr<Statement>> statements;
+    Statements(const std::shared_ptr<Statement>& s) {
         this->statements.push_back(s);
     }
-    Statements(Statements statements, Statement s) {
-        this->statements = statements;
+    Statements(Statements &statements, const std::shared_ptr<Statement>& s) {
+        statements.statements = statements.statements;
         this->statements.push_back(s);
     }
+};
+
+struct returnExp {
+    bool ret;
+    Expression retVal;
+};
+
+struct ifStatement {
+    Expression cond;
+    std::shared_ptr<Statement> stat;
+};
+
+struct ifElseStatement {
+    Expression cond;
+    std::shared_ptr<Statement> statIf;
+    std::shared_ptr<Statement> statElse;
+};
+
+struct whileStatement {
+    Expression cond;
+    std::shared_ptr<Statement> whileScope;
 };
 
 struct Flow {
@@ -194,25 +233,18 @@ struct Flow {
     int line;
 };
 
-struct returnType {
-    bool ret;
-    Expression retVal;
-};
-
-struct ifStatement {
-    Expression cond;
-    Statement stat;
-};
-
-struct ifElseStatement {
-    Expression cond;
-    Statement statIf;
-    Statement statElse;
-};
-
-struct whileStatement {
-    Expression cond;
-    Statement whileScope;
+struct Statement {
+    Statements code;
+    FormalDecl formalDecl;
+    EnumType enumType;
+    EnumDecl enumDecl;
+    Expression exp;
+    Call call;
+    returnExp retType;
+    ifStatement ifStat;
+    ifElseStatement ifElseStat;
+    whileStatement whileStat;
+    Flow breakStatement;
 };
 
 struct RetType {
@@ -220,17 +252,34 @@ struct RetType {
 };
 
 struct FuncDecl {
-    types retType;
+    RetType retType;
     string name;
     Formals formals;
     Statements statements;
+
+    FuncDecl( RetType returnType, string name, Formals &formals, Statements &states) : statements(states),
+    formals(formals), retType(returnType), name(std::move(name)) {}
+
+    string toStr () {
+        vector<string> formls = formals.formalList.formalsToStr();
+        return output::makeFunctionType(typeToStr(retType.type), formls);
+    }
+};
+
+struct Funcs {
+    vector<FuncDecl> funcDeclarations;
+
+    Funcs(Funcs& funcs, FuncDecl fd) {
+        funcDeclarations = funcs.funcDeclarations;
+        funcDeclarations.push_back(fd);
+    }
 };
 
 struct Enums {
     unordered_map<string, EnumDecl> declaredEnums;
 
-    void addEnumerator(EnumDecl enumerator) {
-        declaredEnums[enumerator.namedType] = enumerator;
+    void addEnumerator(const EnumDecl& enumerator) {
+        declaredEnums[enumerator.namedType.name] = enumerator;
     }
 };
 
@@ -260,12 +309,8 @@ typedef union {
     FormalDecl formalDecl;
     Statements statements;
     Statement statement;
+    Program program;
 } Types;
-
-extern Enums declared;
-extern symbolTable symbolTable;
-extern bool insideWhile = false;
-extern bool mainExist = false;
 
 #define YYSTYPE Types
 
