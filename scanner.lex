@@ -1,10 +1,10 @@
 %{
-
 /* Declarations section */
 #include <stdio.h>
 #include "parser.tab.hpp"
 #include "structs.h"
 char *ptr;
+YYSTYPE yylex;
 %}
 
 %option yylineno
@@ -13,21 +13,21 @@ whitespace		([\t\n\r ])
 
 %%
 
-void                        return VOID;
-int                         return INT;
-byte                        return BYTE;
+void                        return TVOID;
+int                         return TINT;
+byte                        return TBYTE;
 b                           return B;
-bool                        return BOOL;
-enum                        return ENUM;
+bool                        return TBOOL;
+enum                        return TENUM;
 and                         return AND;
 or                          return OR;
 not                         return NOT;
 true                        {
-                                yylval boolean = true;
+                                yylex.boolean = true;
                                 return TRUE;
                             }
 false                       {
-                                yylval boolean = false;
+                                yylex.boolean = false;
                                 return FALSE;
                             }
 return                      return RETURN;
@@ -44,52 +44,52 @@ continue                    return CONTINUE;
 "}"                         return RBRACE;
 "="                         return ASSIGN;
 ==|!=                       {
-                                if (yytext = "==")
-                                    yylval.str = "==";
+                                if (yytext == "==")
+                                    yylex.str = "==";
                                 else
-                                    yylval.str = '!=';
+                                    yylex.str = "!=";
                                 return EQUALITY;
                             }
 \<|<=                       {
-                                if (yytext = "<=")
-                                    yylval.str = "<=";
+                                if (yytext == "<=")
+                                    yylex.str = "<=";
                                 else
-                                    yylval.str = '<';
+                                    yylex.str = "<";
                                 return LHSS;
                             }
 >=|>                        {
-                                if (yytext = ">=")
-                                    yylval.str = ">=";
+                                if (yytext == ">=")
+                                    yylex.str = ">=";
                                 else
-                                    yylval.str = '>';
+                                    yylex.str = ">";
                                 return RHSS;
                             }
 \+|\-                       {
-                                if (yytext = "+")
-                                    yylval.str = "+";
+                                if (yytext == "+")
+                                    yylex.str = "+";
                                 else
-                                    yylval.str = "-";
+                                    yylex.str = "-";
                                 return ADDITIVE;
                             }
 \*|"/"                      {
-                                if (yytext = "*")
-                                    yylval.str = '*';
+                                if (yytext == "*")
+                                    yylex.str = "*";
                                 else
-                                    yylval.str = '/';
+                                    yylex.str = "/";
                                 return MUL;
                             }
 [a-zA-Z][a-zA-Z0-9]*	    {
-                                yylval.str = yytext;
+                                yylex.str = yytext;
                                 return ID;
                             }
 0|[1-9][0-9]*			    {
-                                yylval.Integer = strtol(yytext, &ptr, 10);
+                                yylex.integer = strtol(yytext, &ptr, 10);
                                 return NUM;
                             }
 "//"[^{\n|\r|\n\r}]*        ;
 \"([^\n\r\"\\]|\\[rnt\"\\])+\" {
-                                   yylval.str = yytext;
-                                   return STRING;
+                                   yylex.str = yytext;
+                                   return TSTRING;
                                }
 {whitespace}				;
 .                           {

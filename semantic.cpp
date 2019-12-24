@@ -20,6 +20,24 @@ void printi(int n) {
 }
 //-----------------------------------------------------------------------//
 
+void semantic::init() {
+    insideWhile = false;
+    symbolTable.newScope();
+    string name = "print";
+    RetType ret{ VOID };
+    FormalDecl formalDecl;
+    formalDecl.type = STRING;
+    FormalsList fl(formalDecl);
+    Formals formals(fl);
+    shared_ptr<Statement> ptr(nullptr);
+    Statements stat(ptr);
+    FuncDecl funcDecl(ret, name, formals, stat);
+    symbolTable.newFuncDecl(name, funcDecl, 0);
+    name = "printi";
+    formalDecl.type = INT;
+    symbolTable.newFuncDecl(name, funcDecl, 0);
+}
+
 void semantic::binop(Types &target, Types &a, Types &b, const string &sign, int lineno) {
     if (a.exp.isNumber() && b.exp.isNumber()) {
         if (sign == "+") {
@@ -192,6 +210,8 @@ void semantic::callCreate(Types &target, const string &id, int lineno) {
 
 void semantic::block(Types &target, Types &code) {
     target.statement.code.statements = code.statements.statements;
+    endScope();
+    symbolTable.printScope();
     symbolTable.endScope();
 }
 
@@ -286,6 +306,10 @@ void semantic::whileStatement(Types &target, Types &exp, Types &statement, int l
     target.statement.whileStat.cond.id = exp.exp.id;
     target.statement.whileStat.cond.type = exp.exp.type;
     target.statement.whileStat.whileScope = std::make_shared<std::reference_wrapper<Statement>>(statement.statement);
+    insideWhile = false;
+}
+
+void semantic::whileOn() {
     insideWhile = true;
 }
 

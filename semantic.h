@@ -31,6 +31,8 @@ public:
 
 using std::string;
 namespace semantic {
+    void init();
+
     void binop(Types &target, Types &a, Types &b, const string &sign, int lineno);
 
     void logicop(Types &target, Types &a, Types &b, const string &sign, int lineno);
@@ -76,6 +78,8 @@ namespace semantic {
     void ifElseStatement(Types &target, Types &exp, Types &statement1, Types &statement2, int lineno);
 
     void whileStatement(Types &target, Types &exp, Types &statement, int lineno);
+
+    void whileOn();
 
     void enumVarDeck(Types &target, Types &enumType, const string &str, int lineno);
 

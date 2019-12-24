@@ -12,20 +12,8 @@
 	#define YYSTYPE Types
 %}
 
-//TODO Do we need this?
-%union Types{
-     int Integer;
-     bool Boolean;
-     types Type;
-     string Str;
-     EnumClass EnumClass;
-     Call Call;
-     Expression Exp;
-     NamedExpression NamedExp;
-};
-
+%type <program> Program
 %type <exp> Exp
-%type <type> Type
 %type <funcs> Funcs
 %type <funcDecl> FuncDecl
 %type <enums> Enums
@@ -43,14 +31,14 @@
 %type <type> Type
 %type <enumType> EnumType
 
-%token <str> BOOL VOID
-%token <enumClass> ENUM
-%token <integer> INT BYTE B
+%token <str> TBOOL TVOID
+%token <enumClass> TENUM
+%token <integer> TINT TBYTE B
 %token <str> TRUE FALSE
 %token <str> WHILE RETURN
 %token <str> BREAK CONTINUE
 %token <str> SC COMMA
-%token <str> STRING ID
+%token <str> TSTRING ID
 %token <integer> NUM
 
 %right <str> ASSIGN
@@ -70,12 +58,12 @@
 %%
 
 Program : init Enums Funcs {
-                          semantic::checkMain();
-                          semantic::program($$, $1, $2);
-                      }
+                              semantic::checkMain();
+                              semantic::program($$, $2, $3);
+                           }
     ;
 
-init :  %empty { insideWhile = false; }
+init  : %empty { semantic::init(); }
 
 Funcs : %empty { $$.funcs = Funcs(); }
     | FuncDecl Funcs { $$.funcs = Funcs($1, $2); }
@@ -84,16 +72,15 @@ Funcs : %empty { $$.funcs = Funcs(); }
 FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE NewScope Statements RBRACE { semantic::funcDecl($$, $2.str, $1, $4, $8, int lineno); }
     ;
 
-
 Enums : %empty { $$.enums = Enums(); }
     | EnumDecl Enums { semantic::enumDeclToEnums($$, $2, $1); }
     ;
 
-EnumDecl : ENUM ID LBRACE EnumeratorList RBRACE SC { semantic::enumdecl($$, $2.str, $4, yylineno); }
+EnumDecl : TENUM ID LBRACE EnumeratorList RBRACE SC { semantic::enumdecl($$, $2.str, $4, yylineno); }
     ;
 
 RetType : Type { $$.retType.type = $1.type; }
-    | VOID { $$.retType.type = VOID; }
+    | TVOID { $$.retType.type = TVOID; }
     ;
 
 Formals : %empty { $$.formals = Formals(); }
@@ -137,10 +124,9 @@ Statement : LBRACE NewScope Statements RBRACE { semantic::block($$, $3, yylineno
     | WHILE MarkerWhileOn LPAREN Exp RPAREN Statement { semantic::whileStatement($$, $3.exp, $5, yylineno); }
     | BREAK SC { semantic::breakContinue($$, false, yylineno); }
     | CONTINUE SC { semantic::breakContinue($$, true, yylineno); }
-    }
     ;
 
-MarkerWhileOn : %empty { $$.statement.whileStat.statWhile.code.insideWhile = true; }
+MarkerWhileOn : %empty { semantic::whileOn(); }
     ;
 
 NewScope : %empty {
@@ -157,12 +143,12 @@ ExpList : Exp { semantic::expList($$, $1); }
     | Exp COMMA ExpList { semantic::expList($$, $3, $1); }
     ;
 
-Type : INT { $$.type = INT; }
-    | BYTE { $$.type = BYTE; }
-    | BOOL { $$.type = BOOL; }
+Type : TINT { $$.type = INT; }
+    | TBYTE { $$.type = BYTE; }
+    | TBOOL { $$.type = BOOL; }
     ;
 
-EnumType : ENUM ID { semantic::enumType($$, $2.str, yylineno); }
+EnumType : TENUM ID { semantic::enumType($$, $2.str, yylineno); }
     ;
 
 Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
@@ -173,14 +159,14 @@ Exp : LPAREN Exp RPAREN { $$.Exp.val = $2.Exp.val;
     | ID { $$.Exp.id = $1.str;
            $$.Exp.type = STRING; }
     | Call { semantic::call($$, $1, yylineno); }
-    | NUM { $$.Exp.val.integer = yylval.value;
+    | NUM { $$.Exp.val.integer = yylex.value;
             $$.Exp.type = INT; }
     | NUM B { semantic::bytecheck($$, $1, yylineno); }
-    | STRING { $$.Exp.val.str = yylval.str;
+    | TSTRING { $$.Exp.val.str = yylex.str;
                $$.Exp.type = STRING;  }
-    | TRUE { $$.Exp.val.boolean = yylval.value;
+    | TRUE { $$.Exp.val.boolean = yylex.value;
              $$.Exp.type = BOOL;  }
-    | FALSE { $$.Exp.val = yylval.value;
+    | FALSE { $$.Exp.val = yylex.value;
               $$.Exp.type = BOOL; }
     | NOT Exp { semantic::logicop($$, $2, $2, $1.str, yylineno); }
     | Exp AND Exp { semantic::logicop($$, $1, $3, $2.str, yylineno); }

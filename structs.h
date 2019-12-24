@@ -48,6 +48,7 @@ enum types {
     VOID,
     STRING,
     ENUM,
+    ENUMDEF,
     FUNC
 };
 
@@ -57,12 +58,8 @@ string typeToStr(types type);
 struct EnumType {
     string name;
     // the type of enum ID is set to be enumID
-    explicit EnumType(const string id) {
-        name = "enum " + id;
-    }
-    EnumType() {
-        name = "";
-    }
+    explicit EnumType(const string& id);
+    EnumType() { name = ""; }
 };
 
 struct Enumerator {
@@ -72,17 +69,11 @@ struct Enumerator {
 struct EnumeratorList {
     vector<Enumerator> values;
 
-    explicit EnumeratorList(const Enumerator& e) {
-        this->values.push_back(e);
-    }
+    explicit EnumeratorList(const Enumerator& e);
 
-    EnumeratorList(const EnumeratorList& elist, const Enumerator& e) : values(elist.values) {
-        this->values.push_back(e);
-    }
+    EnumeratorList(const EnumeratorList& elist, const Enumerator& e);
 
-    EnumeratorList() {
-        values = vector<Enumerator>();
-    }
+    EnumeratorList() { values = vector<Enumerator>(); }
 };
 
 struct EnumDecl {
@@ -133,15 +124,9 @@ struct Expression {
 struct ExpList {
     vector<std::reference_wrapper<Expression>> args;
 
-    ExpList() {
-        args = vector<std::reference_wrapper<Expression>>();
-    }
-    ExpList(const ExpList& expList, Expression &exp) : args(expList.args) {
-        this->args.emplace_back(exp);
-    }
-    explicit ExpList(Expression exp) {
-        this->args.emplace_back(exp);
-    }
+    ExpList() { args = vector<std::reference_wrapper<Expression>>(); }
+    ExpList(const ExpList& expList, Expression &exp);
+    explicit ExpList(Expression exp);
 };
 
 struct FormalDecl {
@@ -153,21 +138,11 @@ struct FormalDecl {
 struct FormalsList {
     vector<FormalDecl> funDeclParams;
 
-    FormalsList( const FormalDecl& formalDecl, const FormalsList& list) : funDeclParams(list.funDeclParams ) {
-        this->funDeclParams.push_back(formalDecl);
-    }
+    FormalsList( const FormalDecl& formalDecl, const FormalsList& list);
 
-    explicit FormalsList(const FormalDecl& formalDecl){
-        this->funDeclParams.push_back(formalDecl);
-    }
+    explicit FormalsList(const FormalDecl& formalDecl);
 
-    vector<string> formalsToStr() {
-        vector<string> ret;
-        for (const auto& formalDecl : funDeclParams) {
-            ret.insert(ret.begin(), typeToStr(formalDecl.type));
-        }
-        return ret;
-    }
+    vector<string> formalsToStr();
 };
 
 struct Formals {
@@ -178,13 +153,8 @@ struct Formals {
 
 struct Statements {
     vector<std::shared_ptr<Statement>> statements;
-    Statements(const std::shared_ptr<Statement>& s) {
-        this->statements.push_back(s);
-    }
-    Statements(Statements &statements, const std::shared_ptr<Statement>& s) {
-        statements.statements = statements.statements;
-        this->statements.push_back(s);
-    }
+    explicit Statements(const std::shared_ptr<Statement>& s);
+    Statements(Statements &statements, const std::shared_ptr<Statement>& s);
 };
 
 struct returnExp {
@@ -214,17 +184,17 @@ struct Flow {
 };
 
 struct Statement {
-    Statements code;
-    FormalDecl formalDecl;
-    EnumType enumType;
-    EnumDecl enumDecl;
-    Expression exp;
-    Call call;
-    returnExp retType;
-    ifStatement ifStat;
-    ifElseStatement ifElseStat;
-    whileStatement whileStat;
-    Flow breakStatement;
+    Statements code = {};
+    FormalDecl formalDecl = {};
+    EnumType enumType = {};
+    EnumDecl enumDecl = {};
+    Expression exp = {};
+    Call call = {};
+    returnExp retType = {};
+    ifStatement ifStat = {};
+    ifElseStatement ifElseStat = {};
+    whileStatement whileStat = {};
+    Flow breakStatement = {};
 };
 
 struct RetType {
@@ -237,30 +207,21 @@ struct FuncDecl {
     Formals formals;
     Statements statements;
 
-    FuncDecl( RetType returnType, string name, Formals &formals, Statements &states) : statements(states),
-    formals(formals), retType(returnType), name(std::move(name)) {}
+    FuncDecl( RetType returnType, string name, Formals &formals, Statements &states);
 
-    string toStr () {
-        vector<string> formls = formals.formalList.formalsToStr();
-        return output::makeFunctionType(typeToStr(retType.type), formls);
-    }
+    string toStr ();
 };
 
 struct Funcs {
     vector<FuncDecl> funcDeclarations;
 
-    Funcs(Funcs& funcs, FuncDecl fd) {
-        funcDeclarations = funcs.funcDeclarations;
-        funcDeclarations.push_back(fd);
-    }
+    Funcs(Funcs& funcs, const FuncDecl& fd);
 };
 
 struct Enums {
     unordered_map<string, EnumDecl> declaredEnums;
 
-    void addEnumerator(const EnumDecl& enumerator) {
-        declaredEnums[enumerator.namedType.name] = enumerator;
-    }
+    void addEnumerator(const EnumDecl& enumerator);
 };
 
 struct Program {

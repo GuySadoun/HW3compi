@@ -210,6 +210,7 @@ void symbolTable::newFuncDecl(const string &name, FuncDecl& funcDecl, int lineNu
         exit(1);
     }
     tablesStack.front()->newLineForFunc(name, offsetStack.getTop(), funcDecl);
+    output::endScope();
 }
 
 string symbolTable::typeToStr(types type) {
@@ -239,4 +240,15 @@ string symbolTable::typeToStr(types type) {
             break;
     }
     return typeStr;
+}
+
+void symbolTable::printScope() {
+    Table table = *tablesStack.front();
+    for (auto var : table.scopeTable) {
+        if (var->type == ENUM) {
+            //TODO:: printEnumType(const string& name, vector<string>& values); should be called
+            // small structural changes needed.
+        }
+        printID(var->name, var->offset, var->typeStr);
+    }
 }

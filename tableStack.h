@@ -98,6 +98,8 @@ public:
     bool exist(const string &symbol);
 
     static string typeToStr(types type);
+
+    void printScope();
 };
 extern Enums declared;
 extern symbolTable symbolTable;
