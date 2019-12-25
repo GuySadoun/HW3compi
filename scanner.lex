@@ -1,8 +1,8 @@
 %{
 /* Declarations section */
 #include <stdio.h>
-#include "parser.tab.hpp"
 #include "structs.h"
+#include "parser.tab.hpp"
 char *ptr;
 YYSTYPE yylex;
 %}

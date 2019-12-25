@@ -184,17 +184,17 @@ struct Flow {
 };
 
 struct Statement {
-    Statements code = {};
-    FormalDecl formalDecl = {};
-    EnumType enumType = {};
-    EnumDecl enumDecl = {};
-    Expression exp = {};
-    Call call = {};
-    returnExp retType = {};
-    ifStatement ifStat = {};
-    ifElseStatement ifElseStat = {};
-    whileStatement whileStat = {};
-    Flow breakStatement = {};
+    Statements code;
+    FormalDecl formalDecl;
+    EnumType enumType;
+    EnumDecl enumDecl;
+    Expression exp;
+    Call call;
+    returnExp retType;
+    ifStatement ifStat;
+    ifElseStatement ifElseStat;
+    whileStatement whileStat;
+    Flow breakStatement;
 };
 
 struct RetType {
@@ -229,7 +229,7 @@ struct Program {
     Funcs funcs;
 };
 
-typedef union {
+union Types{
     int integer;
     bool boolean;
     types type;
@@ -251,7 +251,9 @@ typedef union {
     Statements statements;
     Statement statement;
     Program program;
-} Types;
+
+    Types() { memset( this, 0, sizeof( Types ) ); }
+};
 
 #define YYSTYPE Types
 

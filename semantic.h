@@ -7,9 +7,8 @@
 
 #include <string>
 #include "hw3_output.hpp"
-#include "tableStack.h"
 #include "structs.h"
-
+#include "tableStack.h"
 
 enum ErrorType {
     SUCCESS,

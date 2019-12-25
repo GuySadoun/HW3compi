@@ -1,15 +1,14 @@
 %{
+    #include "semantic.h"
 	#include <iostream>
 	#include <stdlib.h>
-    #include "semantic.h"
 	using namespace std;
 	using namespace output;
-	extern int yylex();
+	int yylex();
 	extern char* yytext;
 	extern int yylineno;
-	symbolTable *symbolTable;
+	symbolTable symbolTable;
 	int yyerror(const char * message);
-	#define YYSTYPE Types
 %}
 
 %type <program> Program
@@ -30,6 +29,7 @@
 %type <expList> ExpList
 %type <type> Type
 %type <enumType> EnumType
+
 
 %token <str> TBOOL TVOID
 %token <enumClass> TENUM
@@ -69,7 +69,8 @@ Funcs : %empty { $$.funcs = Funcs(); }
     | FuncDecl Funcs { $$.funcs = Funcs($1, $2); }
     ;
 
-FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE NewScope Statements RBRACE { semantic::funcDecl($$, $2.str, $1, $4, $8, int lineno); }
+FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE NewScope Statements RBRACE {
+semantic::funcDecl($$, $2.str, $1, $4, $8, int lineno); }
     ;
 
 Enums : %empty { $$.enums = Enums(); }
